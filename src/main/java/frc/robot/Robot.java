@@ -7,6 +7,8 @@ import frc.lib5k.utils.RobotLogger;
 import frc.lib5k.utils.RobotLogger.Level;
 import frc.robot.commands.DriveControl;
 import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.Gyroscope;
+import frc.robot.subsystems.LocalizationEngine;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -17,9 +19,10 @@ import frc.robot.subsystems.Drive;
  */
 public class Robot extends TimedRobot {
 	RobotLogger logger = RobotLogger.getInstance();
-	
+
 	/* Subsystems */
 	public static Drive m_drive = new Drive();
+	public static LocalizationEngine m_localizationEngine = new LocalizationEngine();
 	public static OI m_oi;
 
 	/* Commands */
@@ -87,6 +90,9 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousInit() {
 		sharedInit();
+
+		// Set the autonomous gyro offset
+		Gyroscope.getInstance().setAutonOffset();
 
 	}
 

@@ -23,6 +23,7 @@ public class DriveControl extends Command {
 
     @SuppressWarnings("checkstyle:JavadocMethod")
     public DriveControl() {
+        requires(Robot.m_drive);
         logger.log("[DriveControl] Configuring Deadband", Level.kRobot);
         m_speedDeadband = new CubicDeadband(0.0, Constants.Deadbands.speed_percision);
         m_rotationDeadband = new CubicDeadband(Constants.Deadbands.rotation_deadband,
@@ -33,7 +34,7 @@ public class DriveControl extends Command {
 
     @Override
     protected void initialize() {
-        Robot.m_drive.setMode(Drive.ControlType.DEFAULT);
+        // Robot.m_drive.setMode(Drive.ControlType.DEFAULT);
     }
 
     @Override
@@ -52,7 +53,7 @@ public class DriveControl extends Command {
         rotation = m_rotationDeadband.feed(rotation);
 
         // Send movement speeds to DriveTrain
-        Robot.m_drive.handleDefaultDrive(speed, rotation, quickTurn, m_shouldInvertControl);
+        Robot.m_drive.smoothDrive(speed, rotation, quickTurn, m_shouldInvertControl);
     }
 
     @Override

@@ -3,21 +3,26 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib5k.components.GearBox;
 import frc.lib5k.control.PID;
 import frc.lib5k.control.SlewLimiter;
-import frc.lib5k.loops.loopables.LoopableSubsystem;
+import frc.lib5k.kinematics.DriveConstraints;
+import frc.lib5k.kinematics.FieldPosition;
 import frc.lib5k.utils.RobotLogger;
 import frc.lib5k.utils.RobotLogger.Level;
 import frc.robot.Constants;
+import frc.robot.Robot;
+import frc.robot.commands.DriveControl;
+import frc.team1114.SimPoint;
 
-public class Drive extends LoopableSubsystem {
+public class Drive extends Subsystem {
 
-    public enum ControlType {
-        DEFAULT, ASSIST, AUTONOMOUS, PATH
-    }
+    // public enum ControlType {
+    // DEFAULT, ASSIST, AUTONOMOUS, PATH
+    // }
 
     RobotLogger logger = RobotLogger.getInstance();
 
@@ -34,7 +39,11 @@ public class Drive extends LoopableSubsystem {
 
     NeutralMode m_desiredBrakeMode = NeutralMode.Coast;
 
-    ControlType m_currentControlType = ControlType.DEFAULT;
+    // ControlType m_currentControlType = ControlType.DEFAULT;
+
+    // PID controllers for pathing
+    PID m_forwardController;
+    PID m_turnController;
 
     public Drive() {
         logger.log("Building drive", Level.kRobot);
@@ -55,20 +64,19 @@ public class Drive extends LoopableSubsystem {
         m_differentialDrive = new DifferentialDrive(m_leftGearbox.getMaster(), m_rightGearbox.getMaster());
 
         // Configure drift PID controller
-        m_driveCorrector = new PID(Constants.DriveTrain.DriftCorrection.kp, Constants.DriveTrain.DriftCorrection.ki,
-                Constants.DriveTrain.DriftCorrection.kd);
-        
+        m_driveCorrector = new PID(Constants.DriveTrain.driftCorrectionGains);
+
         // Configure Slew limiter
         m_speedSlew = new SlewLimiter(Constants.accelerationStep);
 
+        // Configure PID controllers for pathing
+        m_forwardController = new PID(Constants.DriveTrain.forwardPIDGains);
+        m_turnController = new PID(Constants.DriveTrain.turnPIDGains);
+
     }
 
     @Override
-    public synchronized void periodicInput() {
-    }
-
-    @Override
-    public synchronized void periodicOutput() {
+    public void periodic() {
 
         // Handle talon config data
         if (m_isNewConfigData) {
@@ -82,14 +90,49 @@ public class Drive extends LoopableSubsystem {
             // Data had been sent, disable lock
             m_isNewConfigData = false;
         }
+
+        // Output telemetry data
+        outputTelemetry();
+
     }
 
-    public void handleDefaultDrive(double speed, double rotation, boolean quickTurn, boolean invertControl) {
-        // Ensure this method is allowed
-        if (m_currentControlType == ControlType.DEFAULT) {
-            smoothDrive(speed, rotation, quickTurn, invertControl);
+    /**
+     * Drive the robot to a point on the field
+     * 
+     * @param end         Point to drive to
+     * @param constraints Robot kinematic constraints
+     * @param epsilon     Error around end point
+     * 
+     * @return Has the action finished yet
+     */
+    public boolean driveTo(FieldPosition end, DriveConstraints constraints, double epsilon) {
+
+        // Configure PID constraints
+        m_forwardController.setOutputConstraints(constraints.getMinVel(), constraints.getMaxVel());
+        m_turnController.setOutputConstraints(-10, 10);
+
+        // Get error from end point
+        SimPoint error = Robot.m_localizationEngine.getRotatedError(end.getTheta(), end.getX(), end.getY());
+        double targetHeading;
+
+        // Flip X if we are driving backwards
+        if (error.getY() < 0) {
+            error.setX(-error.getX());
         }
+
+        // Increase turning aggression based on path progress
+        // double turnOffset = (error.getX() * turnRate);
+
+        return false;
     }
+
+    // public void handleDefaultDrive(double speed, double rotation, boolean
+    // quickTurn, boolean invertControl) {
+    // // Ensure this method is allowed
+    // if (m_currentControlType == ControlType.DEFAULT) {
+    // smoothDrive(speed, rotation, quickTurn, invertControl);
+    // }
+    // }
 
     /**
      * Drive the robot with some help from sensors
@@ -133,7 +176,8 @@ public class Drive extends LoopableSubsystem {
         // Feed drive command
         m_differentialDrive.curvatureDrive(speed, rotation, quickTurn);
 
-    }
+    }timeDelta/1000.0);
+    // double rightSquaredAccel = (rightMPS - lastRightMPS)
 
     /**
      * Enables or disables brake mode on all drivebase talons.
@@ -151,9 +195,9 @@ public class Drive extends LoopableSubsystem {
 
     }
 
-    public void setMode(ControlType type) {
-        m_currentControlType = type;
-    }
+    // public void setMode(ControlType type) {
+    // m_currentControlType = type;
+    // }
 
     /**
      * Directly drive the gearboxes. This should only be used wile motion profiling
@@ -186,7 +230,24 @@ public class Drive extends LoopableSubsystem {
         return m_rightGearbox.getTicks();
     }
 
-    @Override
+    /**
+     * Get the distance traveled in meters by the left gearbox
+     * 
+     * @return Distance in meters
+     */
+    public double getLeftGearboxMeters() {
+        return ((getLeftGearboxMeters() / Constants.DriveTrain.ticksPerRotation) * Constants.Robot.wheelCirc) / 100.0;
+    }
+
+    /**
+     * Get the distance traveled in meters by the right gearbox
+     * 
+     * @return Distance in meters
+     */
+    public double getRightGearboxMeters() {
+        return ((getRightGearboxMeters() / Constants.DriveTrain.ticksPerRotation) * Constants.Robot.wheelCirc) / 100.0;
+    }
+
     public void outputTelemetry() {
 
         SmartDashboard.putNumber("[DriveTrain] Left gearbox sensor", getLeftGearboxTicks());
@@ -195,14 +256,8 @@ public class Drive extends LoopableSubsystem {
     }
 
     @Override
-    public void stop() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void reset() {
-        // TODO Auto-generated method stub
+    protected void initDefaultCommand() {
+        setDefaultCommand(new DriveControl());
 
     }
 

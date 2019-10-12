@@ -1,9 +1,11 @@
 package frc.robot;
 
+import frc.lib5k.kinematics.PIDProfile;
+
 public class Constants {
 
     /* DriveTrain */
-    public class DriveTrain {
+    public static class DriveTrain {
         public static final int leftFrontMotor = 1;
         public static final int leftRearMotor = 2;
         public static final int rightFrontMotor = 3;
@@ -15,11 +17,16 @@ public class Constants {
 
         public static final int maxVelocity = 0; // Ticks per 100ms
 
-        public class DriftCorrection {
-            public static final double kp = 1.0;
-            public static final double ki = 0.0;
-            public static final double kd = 0.0;
-        }
+        public static PIDProfile driftCorrectionGains = new PIDProfile(1.0, 0.0, 0.0);
+        public static PIDProfile forwardPIDGains = new PIDProfile(1.0, 0.0, 0.0);
+        public static PIDProfile turnPIDGains = new PIDProfile(1.0, 0.0, 0.0);
+
+        public static final int ticksPerRotation = 360;
+    }
+    
+    public class Robot {
+        public static final double wheelDiameter = 6.0 * 2.54; // Wheel is in inches.. Convert to cm
+        public static final double wheelCirc = Math.PI * wheelDiameter;
     }
 
     public class Deadbands {
