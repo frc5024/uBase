@@ -1,5 +1,6 @@
 package frc.robot;
 
+import frc.lib5k.kinematics.DriveConstraints;
 import frc.lib5k.kinematics.PIDProfile;
 
 public class Constants {
@@ -23,10 +24,12 @@ public class Constants {
 
         public static final int ticksPerRotation = 360;
     }
-    
-    public class Robot {
+
+    public static class Robot {
         public static final double wheelDiameter = 6.0 * 2.54; // Wheel is in inches.. Convert to cm
         public static final double wheelCirc = Math.PI * wheelDiameter;
+
+        public static DriveConstraints robotConstraints = new DriveConstraints(0, 5.2); // in m/s
     }
 
     public class Deadbands {
@@ -38,4 +41,5 @@ public class Constants {
 
     /* DriveControl */
     public static final double accelerationStep = 0.2;
+    public static final double pathing_p = 6;
 }
