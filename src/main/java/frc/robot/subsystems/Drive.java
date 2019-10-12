@@ -10,7 +10,9 @@ import frc.lib5k.components.GearBox;
 import frc.lib5k.control.PID;
 import frc.lib5k.control.SlewLimiter;
 import frc.lib5k.kinematics.DriveConstraints;
+import frc.lib5k.kinematics.DriveSignal;
 import frc.lib5k.kinematics.FieldPosition;
+import frc.lib5k.kinematics.DriveSignal.DriveType;
 import frc.lib5k.utils.RobotLogger;
 import frc.lib5k.utils.RobotLogger.Level;
 import frc.robot.Constants;
@@ -44,6 +46,10 @@ public class Drive extends Subsystem {
     // PID controllers for pathing
     PID m_forwardController;
     PID m_turnController;
+
+    // PID controllers for velocity control
+    // PID m_leftVelController;
+    // PID m_rightVelController;
 
     public Drive() {
         logger.log("Building drive", Level.kRobot);
@@ -101,11 +107,13 @@ public class Drive extends Subsystem {
      * 
      * @param end         Point to drive to
      * @param constraints Robot kinematic constraints
+     * @param turnRate    Rate to release turning constraints per 20ms (low numbers
+     *                    will take longer to turn, and create a long arc)
      * @param epsilon     Error around end point
      * 
      * @return Has the action finished yet
      */
-    public boolean driveTo(FieldPosition end, DriveConstraints constraints, double epsilon) {
+    public boolean driveTo(FieldPosition end, DriveConstraints constraints, double turnRate, double epsilon) {
 
         // Configure PID constraints
         m_forwardController.setOutputConstraints(constraints.getMinVel(), constraints.getMaxVel());
@@ -121,18 +129,56 @@ public class Drive extends Subsystem {
         }
 
         // Increase turning aggression based on path progress
-        // double turnOffset = (error.getX() * turnRate);
+        double turnOffset = (error.getX() * turnRate);
 
-        return false;
+        // Bind the turnOffset to the maximum turn rate
+        turnOffset = Math.max(-constraints.getMaxTurn(), turnOffset);
+        turnOffset = Math.min(constraints.getMaxTurn(), turnOffset);
+
+        // Calculate target heading
+        targetHeading = end.getTheta() - turnOffset;
+
+        // Get gyroscope angle
+        double angle = Gyroscope.getInstance().getGyro().getAngle();
+
+        // Set setpoint for robot rotation
+        m_turnController.setSetpoint(targetHeading);
+
+        // Calculate Y's PID value
+        double yOutput = m_forwardController.feed(error.getY());
+
+        // Calculate heading error
+        double headingError = Math.abs(targetHeading - angle);
+        headingError = Math.min(headingError, 90);
+
+        // Determine robot movement values
+        double speed = yOutput * (((-1 * headingError) / 90.0) + 1);
+        double rotation = -m_turnController.feed(angle);
+
+        // Calculate motor speeds from arcade-style inputs
+        DriveSignal signal = DriveSignal.fromArcadeInputs(speed, rotation, DriveType.VELOCITY);
+
+        // Follow the signal
+        rawDrive(signal);
+
+        // Check if the point has been reached
+        double distance = error.getY();
+        boolean finished = false;
+
+        // Check if the PID range is within epsilon
+        if (constraints.getMinVel() <= 0.5) {
+            if (Math.abs(m_forwardController.getError()) < epsilon) {
+                stop();
+                finished = true;
+
+            }
+        } else if (Math.abs(distance) < epsilon) {
+            finished = true;
+        }
+
+        return finished;
     }
 
-    // public void handleDefaultDrive(double speed, double rotation, boolean
-    // quickTurn, boolean invertControl) {
-    // // Ensure this method is allowed
-    // if (m_currentControlType == ControlType.DEFAULT) {
-    // smoothDrive(speed, rotation, quickTurn, invertControl);
-    // }
-    // }
 
     /**
      * Drive the robot with some help from sensors
@@ -176,7 +222,7 @@ public class Drive extends Subsystem {
         // Feed drive command
         m_differentialDrive.curvatureDrive(speed, rotation, quickTurn);
 
-    }timeDelta/1000.0);
+    }
     // double rightSquaredAccel = (rightMPS - lastRightMPS)
 
     /**
@@ -210,6 +256,10 @@ public class Drive extends Subsystem {
         m_isTurning = (l != r);
         m_leftGearbox.set(l);
         m_rightGearbox.set(r);
+    }
+
+    public void rawDrive(DriveSignal signal) {
+        rawDrive(signal.getL(), signal.getR());
     }
 
     /**
@@ -259,6 +309,10 @@ public class Drive extends Subsystem {
     protected void initDefaultCommand() {
         setDefaultCommand(new DriveControl());
 
+    }
+
+    public void stop() {
+        rawDrive(0, 0);
     }
 
 }
