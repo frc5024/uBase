@@ -34,6 +34,11 @@ public class DriveToPoint extends TimedCommand {
     }
 
     @Override
+    protected void initialize() {
+        finished = false;
+    }
+
+    @Override
     protected void execute() {
         finished = Robot.m_drive.driveTo(position, constraints, turnRate, epsilon);
 

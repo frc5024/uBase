@@ -48,7 +48,6 @@ public class Drive extends Subsystem {
     PID m_forwardController;
     PID m_turnController;
 
-
     public Drive() {
         logger.log("Building drive", Level.kRobot);
 
@@ -178,6 +177,37 @@ public class Drive extends Subsystem {
         }
 
         return finished;
+    }
+
+    /**
+     * Turn to an angle
+     * 
+     * @param angle       Desired angle
+     * @param constraints Drivetrain constraints
+     * @param epsilon     Error for angle
+     * 
+     * @return Has the action finished?
+     */
+    public boolean turnTo(double angle, DriveConstraints constraints, double epsilon) {
+        // Get turn output
+        double rotation = -m_turnController.feed(Gyroscope.getInstance().getGyro().getAngle());
+
+        // Bind output
+        rotation = Math.max(rotation, -constraints.getMaxTurn());
+        rotation = Math.min(rotation, constraints.getMaxTurn());
+
+        // Determine if the action has finished
+        if (m_turnController.getError() < epsilon) {
+            // PID finished
+            stop();
+            return true;
+        }
+
+        // Send drive signal
+        DriveSignal signal = DriveSignal.fromArcadeInputs(0.0, rotation, DriveType.STANDARD);
+        rawDrive(signal);
+
+        return false;
     }
 
     /**
@@ -313,6 +343,8 @@ public class Drive extends Subsystem {
 
     public void stop() {
         rawDrive(0, 0);
+        m_forwardController.reset();
+        m_turnController.reset();
     }
 
 }
