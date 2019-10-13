@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib5k.components.GearBox;
 import frc.lib5k.control.PID;
@@ -47,9 +48,6 @@ public class Drive extends Subsystem {
     PID m_forwardController;
     PID m_turnController;
 
-    // PID controllers for velocity control
-    // PID m_leftVelController;
-    // PID m_rightVelController;
 
     public Drive() {
         logger.log("Building drive", Level.kRobot);
@@ -79,6 +77,9 @@ public class Drive extends Subsystem {
         m_forwardController = new PID(Constants.DriveTrain.forwardPIDGains);
         m_turnController = new PID(Constants.DriveTrain.turnPIDGains);
 
+        // Send PID controllers
+        Shuffleboard.getTab("DriverStation").add("ForwardPID", m_forwardController);
+        Shuffleboard.getTab("DriverStation").add("TurnPID", m_turnController);
     }
 
     @Override
@@ -103,7 +104,7 @@ public class Drive extends Subsystem {
     }
 
     /**
-     * Drive the robot to a point on the field
+     * Drive the robot to a relative point in space
      * 
      * @param end         Point to drive to
      * @param constraints Robot kinematic constraints
@@ -178,7 +179,6 @@ public class Drive extends Subsystem {
 
         return finished;
     }
-
 
     /**
      * Drive the robot with some help from sensors
@@ -286,7 +286,7 @@ public class Drive extends Subsystem {
      * @return Distance in meters
      */
     public double getLeftGearboxMeters() {
-        return ((getLeftGearboxMeters() / Constants.DriveTrain.ticksPerRotation) * Constants.Robot.wheelCirc) / 100.0;
+        return ((getLeftGearboxTicks() / Constants.DriveTrain.ticksPerRotation) * Constants.Robot.wheelCirc) / 100.0;
     }
 
     /**
@@ -295,7 +295,7 @@ public class Drive extends Subsystem {
      * @return Distance in meters
      */
     public double getRightGearboxMeters() {
-        return ((getRightGearboxMeters() / Constants.DriveTrain.ticksPerRotation) * Constants.Robot.wheelCirc) / 100.0;
+        return ((getRightGearboxTicks() / Constants.DriveTrain.ticksPerRotation) * Constants.Robot.wheelCirc) / 100.0;
     }
 
     public void outputTelemetry() {

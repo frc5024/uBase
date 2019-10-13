@@ -23,7 +23,8 @@ public class DriveControl extends Command {
 
     @SuppressWarnings("checkstyle:JavadocMethod")
     public DriveControl() {
-        // requires(Robot.m_drive); // Not sure if we need this
+        requires(Robot.m_drive);
+
         logger.log("[DriveControl] Configuring Deadband", Level.kRobot);
         m_speedDeadband = new CubicDeadband(0.0, Constants.Deadbands.speed_percision);
         m_rotationDeadband = new CubicDeadband(Constants.Deadbands.rotation_deadband,

@@ -43,6 +43,10 @@ public class Gyroscope {
         autonOffset = m_gyro.getAngle();
     }
 
+    public void overrideAutonOffset(double angle) {
+        autonOffset = angle;
+    }
+
     public double getAutonOffset() {
         return autonOffset;
     }

@@ -76,6 +76,20 @@ public class LocalizationEngine extends Subsystem {
     }
 
     /**
+     * @param xPos Robot x position 
+     */
+    public void setXPos(double xPos) {
+        this.xPos = xPos;
+    }
+
+    /**
+     * @param yPos Robot y position
+     */
+    public void setYPos(double yPos) {
+        this.yPos = yPos;
+    }
+
+    /**
      * Rotates the xy coordinates to be relative to the angle of the target
      * 
      * From team 1114:

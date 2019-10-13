@@ -1,10 +1,12 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import frc.lib5k.utils.RobotLogger;
 import frc.lib5k.utils.RobotLogger.Level;
+import frc.robot.autonomous.Chooser;
 import frc.robot.commands.DriveControl;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Gyroscope;
@@ -28,6 +30,11 @@ public class Robot extends TimedRobot {
 	/* Commands */
 	DriveControl m_driveControl;
 
+	/* Auton */
+	Chooser m_chooser;
+
+	CommandGroup m_autonomousCommand;
+
 	/**
 	 * This function is run when the robot is first started up and should be used
 	 * for any initialization code.
@@ -39,6 +46,8 @@ public class Robot extends TimedRobot {
 
 		logger.log("Building commands", Level.kRobot);
 		m_driveControl = new DriveControl();
+
+		m_chooser = new Chooser();
 
 	}
 
@@ -94,6 +103,14 @@ public class Robot extends TimedRobot {
 		// Set the autonomous gyro offset
 		Gyroscope.getInstance().setAutonOffset();
 
+		// Read selected autonomous mode
+		m_autonomousCommand = m_chooser.getAutonomousCommand();
+
+		// Try to start the command
+		if (m_autonomousCommand != null) {
+			m_autonomousCommand.start();
+		}
+
 	}
 
 	/**
@@ -107,6 +124,11 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopInit() {
 		sharedInit();
+
+		// Stop autonomous
+		if (m_autonomousCommand != null){
+			m_autonomousCommand.cancel();
+		}
 
 		/* Start commands */
 		if (m_driveControl != null) {
