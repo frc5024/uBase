@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
+import frc.lib5k.kinematics.FieldPosition;
 import frc.robot.Robot;
 import frc.team1114.SimPoint;
 
@@ -17,6 +18,7 @@ public class LocalizationEngine extends Subsystem {
     private double xPos, yPos = 0.0;
     private double timeDelta = 20;
     private double lastTime = 0.0;
+    private double gyroAngle = 0.0;
 
     private double lastLeftMPS, lastRightMPS = 0.0;
 
@@ -38,7 +40,7 @@ public class LocalizationEngine extends Subsystem {
 
         // Get the gyro angle, and account for offset
         // TODO: Not sure which one of these lines is correct
-        double gyroAngle = m_gyroInstance.getAngle() + (Gyroscope.getInstance().getAutonOffset() - 90);
+        gyroAngle = m_gyroInstance.getAngle() + (Gyroscope.getInstance().getAutonOffset() - 90);
         // double gyroAngle = m_gyroInstance.getAngle() -
         // Gyroscope.getInstance().getAutonOffset();
 
@@ -75,8 +77,21 @@ public class LocalizationEngine extends Subsystem {
         return yPos;
     }
 
+    public double getAngle() {
+        return gyroAngle;
+    }
+
     /**
-     * @param xPos Robot x position 
+     * Get the robot position (field relative)
+     * 
+     * @return Robot position
+     */
+    public FieldPosition getRobotPosition() {
+        return new FieldPosition(getXPos(), getYPos(), getAngle());
+    }
+
+    /**
+     * @param xPos Robot x position
      */
     public void setXPos(double xPos) {
         this.xPos = xPos;

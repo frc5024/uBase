@@ -101,6 +101,7 @@ public class Robot extends TimedRobot {
 		sharedInit();
 
 		// Set the autonomous gyro offset
+		Gyroscope.getInstance().getGyro().reset();
 		Gyroscope.getInstance().setAutonOffset();
 
 		// Read selected autonomous mode
@@ -126,7 +127,7 @@ public class Robot extends TimedRobot {
 		sharedInit();
 
 		// Stop autonomous
-		if (m_autonomousCommand != null){
+		if (m_autonomousCommand != null) {
 			m_autonomousCommand.cancel();
 		}
 
