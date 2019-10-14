@@ -41,6 +41,7 @@ public class Drive extends Subsystem {
     boolean m_isNewConfigData = false;
 
     NeutralMode m_desiredBrakeMode = NeutralMode.Coast;
+    private int m_leftEncoderOffset, m_rightEncoderOffset = 0;
 
     // ControlType m_currentControlType = ControlType.DEFAULT;
 
@@ -298,7 +299,7 @@ public class Drive extends Subsystem {
      * @return Number of ticks
      */
     public int getLeftGearboxTicks() {
-        return m_leftGearbox.getTicks();
+        return m_leftGearbox.getTicks() - m_leftEncoderOffset;
     }
 
     /**
@@ -307,7 +308,7 @@ public class Drive extends Subsystem {
      * @return Number of ticks
      */
     public int getRightGearboxTicks() {
-        return m_rightGearbox.getTicks();
+        return m_rightGearbox.getTicks() - m_rightEncoderOffset;
     }
 
     /**
@@ -341,10 +342,23 @@ public class Drive extends Subsystem {
 
     }
 
+    /**
+     * To be called when the Drivetrain stops an action (path planning, or PID
+     * movement)
+     */
     public void stop() {
         rawDrive(0, 0);
         m_forwardController.reset();
         m_turnController.reset();
+    }
+
+    /**
+     * Reset encoder readings to zero
+     */
+    public void zeroEncoders() {
+        m_leftEncoderOffset = m_leftGearbox.getTicks();
+        m_rightEncoderOffset = m_rightGearbox.getTicks();
+
     }
 
 }

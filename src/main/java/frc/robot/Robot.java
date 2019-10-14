@@ -103,6 +103,7 @@ public class Robot extends TimedRobot {
 		// Set the autonomous gyro offset
 		Gyroscope.getInstance().getGyro().reset();
 		Gyroscope.getInstance().setAutonOffset();
+		m_drive.zeroEncoders();
 
 		// Read selected autonomous mode
 		m_autonomousCommand = m_chooser.getAutonomousCommand();
