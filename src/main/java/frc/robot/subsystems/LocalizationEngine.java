@@ -20,7 +20,7 @@ public class LocalizationEngine extends Subsystem {
     private double lastTime = 0.0;
     private double gyroAngle = 0.0;
 
-    // private double lastLeftMPS, lastRightMPS = 0.0;
+    private double lastLeftMPS, lastRightMPS = 0.0;
 
     AHRS m_gyroInstance;
 
