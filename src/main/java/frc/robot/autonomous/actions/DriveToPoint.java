@@ -36,6 +36,7 @@ public class DriveToPoint extends TimedCommand {
     @Override
     protected void initialize() {
         finished = false;
+        System.out.println("Starting movement");
     }
 
     @Override
@@ -46,6 +47,9 @@ public class DriveToPoint extends TimedCommand {
 
     @Override
     protected boolean isFinished() {
+        if(finished){
+            System.out.println("Finish movement");
+        }
         return finished;
     }
 

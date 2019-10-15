@@ -4,6 +4,7 @@ import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.lib5k.kinematics.FieldPosition;
+import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.team1114.SimPoint;
 
@@ -45,8 +46,10 @@ public class LocalizationEngine extends Subsystem {
         // Gyroscope.getInstance().getAutonOffset();
 
         // Calculate M/S of each gearbox
-        double leftMPS = Robot.m_drive.getLeftGearboxMeters() * (1000.0 / timeDelta);
-        double rightMPS = Robot.m_drive.getRightGearboxMeters() * (1000.0 / timeDelta);
+        double leftMPS = Robot.m_drive.getLeftEncoder().getMetersPerCycle(Constants.DriveTrain.ticksPerRotation,
+                Constants.Robot.wheelCirc) * (1000.0 / timeDelta);
+        double rightMPS = Robot.m_drive.getRightEncoder().getMetersPerCycle(Constants.DriveTrain.ticksPerRotation,
+                Constants.Robot.wheelCirc) * (1000.0 / timeDelta);
 
         // Calculate acceleration for each gearbox (squared)
         // double leftSquaredAccel = (leftMPS - lastLeftMPS) / (timeDelta / 1000.0);
@@ -66,6 +69,8 @@ public class LocalizationEngine extends Subsystem {
         // Set Robot position
         xPos += xSpeed * timeDelta / 1000.0;
         yPos += ySpeed * timeDelta / 1000.0;
+
+        System.out.println("" + xPos + ", " + yPos + " " + xSpeed);
     }
 
     public double getXPos() {

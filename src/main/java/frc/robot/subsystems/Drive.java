@@ -7,7 +7,9 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.lib5k.components.EncoderBase;
 import frc.lib5k.components.GearBox;
+import frc.lib5k.components.GearBoxEncoder;
 import frc.lib5k.control.PID;
 import frc.lib5k.control.SlewLimiter;
 import frc.lib5k.kinematics.DriveConstraints;
@@ -49,6 +51,10 @@ public class Drive extends Subsystem {
     PID m_forwardController;
     PID m_turnController;
 
+    // Encoders
+    EncoderBase m_leftEncoder;
+    EncoderBase m_rightEncoder;
+
     public Drive() {
         logger.log("Building drive", Level.kRobot);
 
@@ -66,9 +72,12 @@ public class Drive extends Subsystem {
 
         // Build drivebase
         m_differentialDrive = new DifferentialDrive(m_leftGearbox.getMaster(), m_rightGearbox.getMaster());
+        m_differentialDrive.setSafetyEnabled(false);
+        m_leftGearbox.getMaster().setSafetyEnabled(false);
+        m_rightGearbox.getMaster().setSafetyEnabled(false);
 
         // Configure drift PID controller
-        m_driveCorrector = new PID(Constants.DriveTrain.driftCorrectionGains);
+        m_driveCorrector = new PID(Constants.DriveTrain.turnPIDGains);
 
         // Configure Slew limiter
         m_speedSlew = new SlewLimiter(Constants.accelerationStep);
@@ -77,6 +86,10 @@ public class Drive extends Subsystem {
         m_forwardController = new PID(Constants.DriveTrain.forwardPIDGains);
         m_turnController = new PID(Constants.DriveTrain.turnPIDGains);
 
+        // Configure encoders
+        m_leftEncoder = new GearBoxEncoder(m_leftGearbox);
+        m_rightEncoder = new GearBoxEncoder(m_rightGearbox);
+
         // Send PID controllers
         Shuffleboard.getTab("DriverStation").add("ForwardPID", m_forwardController);
         Shuffleboard.getTab("DriverStation").add("TurnPID", m_turnController);
@@ -84,6 +97,9 @@ public class Drive extends Subsystem {
 
     @Override
     public void periodic() {
+        // Update encoders
+        m_leftEncoder.update();
+        m_rightEncoder.update();
 
         // Handle talon config data
         if (m_isNewConfigData) {
@@ -104,7 +120,8 @@ public class Drive extends Subsystem {
     }
 
     /**
-     * Drive the robot to a relative point in space
+     * Drive the robot to a relative point in space. Note: If driving backwards, the
+     * minimum velocity must be less than 0
      * 
      * @param end         Point to drive to
      * @param constraints Robot kinematic constraints
@@ -117,7 +134,10 @@ public class Drive extends Subsystem {
     public boolean driveTo(FieldPosition end, DriveConstraints constraints, double turnRate, double epsilon) {
 
         // Configure PID constraints
-        m_forwardController.setOutputConstraints(constraints.getMinVel(), constraints.getMaxVel());
+        // m_forwardController.setOutputConstraints(constraints.getMinVel(),
+        // constraints.getMaxVel());
+        m_forwardController.setOutputConstraints(-constraints.getMaxVel(), constraints.getMaxVel()); // Deal with
+                                                                                                     // reverse
         m_turnController.setOutputConstraints(-10, 10);
 
         // Get error from end point
@@ -221,24 +241,25 @@ public class Drive extends Subsystem {
     public void smoothDrive(double speed, double rotation, boolean quickTurn, boolean invertControl) {
 
         // Check if we should be correcting robot drift
-        if (rotation == 0.0) {
-            double current_angle = Gyroscope.getInstance().getGyro().getAngle();
+        // if (rotation == 0.0 && Math.abs(speed) > 0.05) {
+        // double current_angle = Gyroscope.getInstance().getGyro().getAngle();
 
-            // Set drift correction and reset setpoint if this state is new
-            if (!m_driftCorrectionActive) {
+        // // Set drift correction and reset setpoint if this state is new
+        // if (!m_driftCorrectionActive) {
 
-                m_driveCorrector.setSetpoint(current_angle);
+        // m_driveCorrector.reset();
+        // m_driveCorrector.setSetpoint(current_angle);
 
-                // Set state
-                m_driftCorrectionActive = true;
-            }
+        // // Set state
+        // m_driftCorrectionActive = true;
+        // }
 
-            // Determine rotation correction
-            rotation = m_driveCorrector.feed(current_angle);
-        } else {
-            // Disable drift correction
-            m_driftCorrectionActive = false;
-        }
+        // // Determine rotation correction
+        // rotation = m_driveCorrector.feed(current_angle);
+        // } else {
+        // // Disable drift correction
+        // m_driftCorrectionActive = false;
+        // }
 
         // Handle inverse control
         speed = (invertControl) ? speed * -1 : speed;
@@ -251,7 +272,8 @@ public class Drive extends Subsystem {
         m_isTurning = (rotation != 0.0);
 
         // Feed drive command
-        m_differentialDrive.curvatureDrive(speed, rotation, quickTurn);
+        // m_differentialDrive.curvatureDrive(speed, rotation, quickTurn);
+        m_differentialDrive.arcadeDrive(speed, rotation);
 
     }
     // double rightSquaredAccel = (rightMPS - lastRightMPS)
@@ -299,7 +321,8 @@ public class Drive extends Subsystem {
      * @return Number of ticks
      */
     public int getLeftGearboxTicks() {
-        return m_leftGearbox.getTicks() - m_leftEncoderOffset;
+        // return m_leftGearbox.getTicks() - m_leftEncoderOffset;
+        return m_leftEncoder.getTicks();
     }
 
     /**
@@ -308,7 +331,8 @@ public class Drive extends Subsystem {
      * @return Number of ticks
      */
     public int getRightGearboxTicks() {
-        return m_rightGearbox.getTicks() - m_rightEncoderOffset;
+        // return m_rightGearbox.getTicks() - m_rightEncoderOffset;
+        return m_rightEncoder.getTicks();
     }
 
     /**
@@ -317,7 +341,9 @@ public class Drive extends Subsystem {
      * @return Distance in meters
      */
     public double getLeftGearboxMeters() {
-        return ((getLeftGearboxTicks() / Constants.DriveTrain.ticksPerRotation) * Constants.Robot.wheelCirc) / 100.0;
+        // return ((getLeftGearboxTicks() / Constants.DriveTrain.ticksPerRotation) *
+        // Constants.Robot.wheelCirc) / 100.0;
+        return m_leftEncoder.getMeters(Constants.DriveTrain.ticksPerRotation, Constants.Robot.wheelCirc);
     }
 
     /**
@@ -326,7 +352,17 @@ public class Drive extends Subsystem {
      * @return Distance in meters
      */
     public double getRightGearboxMeters() {
-        return ((getRightGearboxTicks() / Constants.DriveTrain.ticksPerRotation) * Constants.Robot.wheelCirc) / 100.0;
+        // return ((getRightGearboxTicks() / Constants.DriveTrain.ticksPerRotation) *
+        // Constants.Robot.wheelCirc) / 100.0;
+        return m_rightEncoder.getMeters(Constants.DriveTrain.ticksPerRotation, Constants.Robot.wheelCirc);
+    }
+
+    public EncoderBase getLeftEncoder() {
+        return m_leftEncoder;
+    }
+
+    public EncoderBase getRightEncoder() {
+        return m_rightEncoder;
     }
 
     public void outputTelemetry() {
@@ -356,8 +392,11 @@ public class Drive extends Subsystem {
      * Reset encoder readings to zero
      */
     public void zeroEncoders() {
-        m_leftEncoderOffset = m_leftGearbox.getTicks();
-        m_rightEncoderOffset = m_rightGearbox.getTicks();
+        // m_leftEncoderOffset = m_leftGearbox.getTicks();
+        // m_rightEncoderOffset = m_rightGearbox.getTicks();
+
+        m_leftEncoder.zero();
+        m_rightEncoder.zero();
 
     }
 

@@ -7,7 +7,6 @@ import frc.lib5k.utils.RobotLogger;
 import frc.lib5k.utils.RobotLogger.Level;
 import frc.robot.Constants;
 import frc.robot.Robot;
-import frc.robot.subsystems.Drive;
 
 public class DriveControl extends Command {
     RobotLogger logger = RobotLogger.getInstance();

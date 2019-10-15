@@ -49,6 +49,8 @@ public class Robot extends TimedRobot {
 
 		m_chooser = new Chooser();
 
+		logger.start(0.02);
+
 	}
 
 	/**
@@ -68,6 +70,8 @@ public class Robot extends TimedRobot {
 		// Reduce network stress by disabling default telem. If LiveWindow is needed,
 		// reboot bot, then start Test Mode
 		LiveWindow.disableAllTelemetry();
+
+		m_drive.setBrakes(true);
 	}
 
 	/**
@@ -77,6 +81,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void disabledInit() {
+		m_drive.setBrakes(false);
 	}
 
 	@Override
@@ -107,10 +112,12 @@ public class Robot extends TimedRobot {
 
 		// Read selected autonomous mode
 		m_autonomousCommand = m_chooser.getAutonomousCommand();
+		// m_autonomousCommand.start();
 
 		// Try to start the command
 		if (m_autonomousCommand != null) {
 			m_autonomousCommand.start();
+			logger.log("Starting autonomous");
 		}
 
 	}
@@ -121,6 +128,10 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousPeriodic() {
 		Scheduler.getInstance().run();
+
+		if (!m_autonomousCommand.isRunning()) {
+			logger.log("Auto finished");
+		}
 	}
 
 	@Override
