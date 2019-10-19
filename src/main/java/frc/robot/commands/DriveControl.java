@@ -13,7 +13,7 @@ public class DriveControl extends Command {
 
     // Stored movement data
     double speed, rotation = 0.0;
-    Toggle m_dtInvertToggle;
+    Toggle m_dtInvertToggle, m_rotationLimitToggle;
     boolean m_shouldInvertControl = false;
 
     // Deadband
@@ -30,6 +30,8 @@ public class DriveControl extends Command {
                 Constants.Deadbands.roataion_percision);
 
         m_dtInvertToggle = new Toggle();
+        m_rotationLimitToggle = new Toggle();
+        m_rotationLimitToggle.feed(true);
     }
 
     @Override
@@ -46,11 +48,15 @@ public class DriveControl extends Command {
 
         // Read movement inversion
         m_shouldInvertControl = m_dtInvertToggle.feed(Robot.m_oi.getDriveTrainInvert());
-        boolean quickTurn = Robot.m_oi.getQuickTurn();
+        boolean quickTurn = m_rotationLimitToggle.feed(Robot.m_oi.getQuickTurn());
+        // boolean quickTurn = Robot.m_oi.getQuickTurn();
 
         // Pass data through deadbands
         // speed = m_speedDeadband.feed(speed);
         rotation = m_rotationDeadband.feed(rotation);
+
+        // Limit rotation
+        rotation = (quickTurn) ? rotation : rotation * .9;
 
         // Send movement speeds to DriveTrain
         Robot.m_drive.smoothDrive(speed, rotation, quickTurn, m_shouldInvertControl);

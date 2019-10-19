@@ -51,6 +51,11 @@ public class Robot extends TimedRobot {
 
 		logger.start(0.02);
 
+		// Init sensors
+		Gyroscope.getInstance().getGyro().reset();
+		Gyroscope.getInstance().setAutonOffset();
+		m_drive.zeroEncoders();
+
 	}
 
 	/**
@@ -109,6 +114,7 @@ public class Robot extends TimedRobot {
 		Gyroscope.getInstance().getGyro().reset();
 		Gyroscope.getInstance().setAutonOffset();
 		m_drive.zeroEncoders();
+		m_drive.stop();
 
 		// Read selected autonomous mode
 		m_autonomousCommand = m_chooser.getAutonomousCommand();
@@ -117,7 +123,6 @@ public class Robot extends TimedRobot {
 		// Try to start the command
 		if (m_autonomousCommand != null) {
 			m_autonomousCommand.start();
-			logger.log("Starting autonomous");
 		}
 
 	}
@@ -129,9 +134,6 @@ public class Robot extends TimedRobot {
 	public void autonomousPeriodic() {
 		Scheduler.getInstance().run();
 
-		if (!m_autonomousCommand.isRunning()) {
-			logger.log("Auto finished");
-		}
 	}
 
 	@Override

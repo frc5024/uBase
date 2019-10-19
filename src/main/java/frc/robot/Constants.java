@@ -18,15 +18,19 @@ public class Constants {
 
         public static final int maxVelocity = 0; // Ticks per 100ms
 
-        // public static PIDProfile driftCorrectionGains = new PIDProfile(1.0, 0.0, 0.0);
+        // public static PIDProfile driftCorrectionGains = new PIDProfile(1.0, 0.0,
+        // 0.0);
         public static PIDProfile forwardPIDGains = new PIDProfile(1.0, 0.0, 0.0);
         // public static PIDProfile turnPIDGains = new PIDProfile(0.05, 0.0, 0.0);
-        public static PIDProfile turnPIDGains = new PIDProfile(.6 * 0.05, 1.2* 0.05 / 1, 3* 0.05 *1 /40);
+        // public static PIDProfile turnPIDGains = new PIDProfile(.6 * 0.05, 1.2 * 0.05
+        // / 1, 3 * 0.05 * 1 / 40);
 
-        public static final int ticksPerRotation = 360;
+        // Auto-gen a PID profile, then use the modifier to make any needed edits
+        public static PIDProfile turnPIDGains = PIDProfile.autoConfig(0.05, 1).modify(new PIDProfile(0, 0, 0));
+
+        public static final int ticksPerRotation = 720;// 1440; // 360;
     }
 
-    
     public static class Robot {
         public static final double wheelDiameter = 6.0 * 2.54; // Wheel is in inches.. Convert to cm
         public static final double wheelCirc = Math.PI * wheelDiameter;

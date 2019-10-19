@@ -29,6 +29,7 @@ public class DriveToPoint extends TimedCommand {
         this.turnRate = turnRate;
         this.epsilon = epsilon;
 
+
         requires(Robot.m_drive);
 
     }
@@ -47,10 +48,18 @@ public class DriveToPoint extends TimedCommand {
 
     @Override
     protected boolean isFinished() {
-        if(finished){
+        if (finished) {
             System.out.println("Finish movement");
         }
-        return finished;
+        return isTimedOut() || finished;
+    }
+
+    @Override
+    protected void end() {
+        boolean brakes = Robot.m_drive.getBrakes();
+        Robot.m_drive.setBrakes(false);
+        Robot.m_drive.stop();
+        Robot.m_drive.setBrakes(brakes);
     }
 
 }

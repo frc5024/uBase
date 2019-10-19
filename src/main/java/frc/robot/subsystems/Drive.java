@@ -11,6 +11,7 @@ import frc.lib5k.components.EncoderBase;
 import frc.lib5k.components.GearBox;
 import frc.lib5k.components.GearBoxEncoder;
 import frc.lib5k.control.PID;
+import frc.lib5k.control.PIDv2;
 import frc.lib5k.control.SlewLimiter;
 import frc.lib5k.kinematics.DriveConstraints;
 import frc.lib5k.kinematics.DriveSignal;
@@ -48,8 +49,8 @@ public class Drive extends Subsystem {
     // ControlType m_currentControlType = ControlType.DEFAULT;
 
     // PID controllers for pathing
-    PID m_forwardController;
-    PID m_turnController;
+    PIDv2 m_forwardController;
+    PIDv2 m_turnController;
 
     // Encoders
     EncoderBase m_leftEncoder;
@@ -83,8 +84,8 @@ public class Drive extends Subsystem {
         m_speedSlew = new SlewLimiter(Constants.accelerationStep);
 
         // Configure PID controllers for pathing
-        m_forwardController = new PID(Constants.DriveTrain.forwardPIDGains);
-        m_turnController = new PID(Constants.DriveTrain.turnPIDGains);
+        m_forwardController = new PIDv2(Constants.DriveTrain.forwardPIDGains);
+        m_turnController = new PIDv2(Constants.DriveTrain.turnPIDGains);
 
         // Configure encoders
         m_leftEncoder = new GearBoxEncoder(m_leftGearbox);
@@ -134,10 +135,10 @@ public class Drive extends Subsystem {
     public boolean driveTo(FieldPosition end, DriveConstraints constraints, double turnRate, double epsilon) {
 
         // Configure PID constraints
-        // m_forwardController.setOutputConstraints(constraints.getMinVel(),
-        // constraints.getMaxVel());
-        m_forwardController.setOutputConstraints(-constraints.getMaxVel(), constraints.getMaxVel()); // Deal with
-                                                                                                     // reverse
+        m_forwardController.setOutputConstraints(constraints.getMinVel(), constraints.getMaxVel()); // This is sketchy..
+        // m_forwardController.setOutputConstraints(-constraints.getMaxVel(),
+        // constraints.getMaxVel()); // Deal with
+        // reverse
         m_turnController.setOutputConstraints(-10, 10);
 
         // Get error from end point
@@ -166,7 +167,7 @@ public class Drive extends Subsystem {
         m_turnController.setSetpoint(targetHeading);
 
         // Calculate Y's PID value
-        double yOutput = m_forwardController.feed(error.getY());
+        double yOutput = m_forwardController.calculate(error.getY());
 
         // Calculate heading error
         double headingError = Math.abs(targetHeading - angle);
@@ -185,16 +186,20 @@ public class Drive extends Subsystem {
         // Check if the point has been reached
         double distance = error.getY();
         boolean finished = false;
+        System.out.println(distance);
+        System.out.println(m_leftGearbox.getTicks());
 
         // Check if the PID range is within epsilon
         if (constraints.getMinVel() <= 0.5) {
-            if (Math.abs(m_forwardController.getError()) < epsilon) {
+            if (m_forwardController.isFinished(epsilon)) { // Bug here
                 stop();
                 finished = true;
+                System.out.println("Finished from epsilon");
 
             }
         } else if (Math.abs(distance) < epsilon) {
             finished = true;
+            System.out.println("Finished from distance");
         }
 
         return finished;
@@ -218,7 +223,7 @@ public class Drive extends Subsystem {
         rotation = Math.min(rotation, constraints.getMaxTurn());
 
         // Determine if the action has finished
-        if (m_turnController.getError() < epsilon) {
+        if (m_turnController.isFinished(epsilon)) {
             // PID finished
             stop();
             return true;
@@ -292,6 +297,10 @@ public class Drive extends Subsystem {
         // Force an update
         m_isNewConfigData = true;
 
+    }
+
+    public boolean getBrakes() {
+        return m_desiredBrakeMode == NeutralMode.Brake;
     }
 
     // public void setMode(ControlType type) {

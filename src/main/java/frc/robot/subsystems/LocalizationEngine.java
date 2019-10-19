@@ -70,7 +70,8 @@ public class LocalizationEngine extends Subsystem {
         xPos += xSpeed * timeDelta / 1000.0;
         yPos += ySpeed * timeDelta / 1000.0;
 
-        System.out.println("" + xPos + ", " + yPos + " " + xSpeed);
+        // System.out.println("" + xPos + ", " + yPos + " " + xSpeed);
+        System.out.println(getRobotPosition().toString());
     }
 
     public double getXPos() {
