@@ -26,6 +26,7 @@ public class Robot extends TimedRobot {
 	public static Drive m_drive = new Drive();
 	public static LocalizationEngine m_localizationEngine = new LocalizationEngine();
 	public static OI m_oi;
+	public static Gyroscope m_gyro = Gyroscope.getInstance();
 
 	/* Commands */
 	DriveControl m_driveControl;

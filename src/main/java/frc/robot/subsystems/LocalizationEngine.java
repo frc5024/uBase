@@ -41,7 +41,9 @@ public class LocalizationEngine extends Subsystem {
 
         // Get the gyro angle, and account for offset
         // TODO: Not sure which one of these lines is correct
-        gyroAngle = m_gyroInstance.getAngle() + (Gyroscope.getInstance().getAutonOffset() - 90);
+        // gyroAngle = m_gyroInstance.getAngle() +
+        // (Gyroscope.getInstance().getAutonOffset() - 90);
+        gyroAngle = Gyroscope.getInstance().getFusedAngle() + (Gyroscope.getInstance().getAutonOffset() - 90);
         // double gyroAngle = m_gyroInstance.getAngle() -
         // Gyroscope.getInstance().getAutonOffset();
 

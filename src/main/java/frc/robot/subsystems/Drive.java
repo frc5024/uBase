@@ -161,7 +161,8 @@ public class Drive extends Subsystem {
         targetHeading = end.getTheta() - turnOffset;
 
         // Get gyroscope angle
-        double angle = Gyroscope.getInstance().getGyro().getAngle();
+        // double angle = Gyroscope.getInstance().getGyro().getAngle();
+        double angle = Gyroscope.getInstance().getFusedAngle();
 
         // Set setpoint for robot rotation
         m_turnController.setSetpoint(targetHeading);
