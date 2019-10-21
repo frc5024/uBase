@@ -135,12 +135,12 @@ public class Drive extends Subsystem {
     public boolean driveTo(FieldPosition end, DriveConstraints constraints, double turnRate, double epsilon) {
 
         // Configure PID constraints
-        m_forwardController.setOutputConstraints(constraints.getMinVel(), constraints.getMaxVel()); // This is sketchy..
+        m_forwardController.setOutputConstraints(constraints.getMinVel(), constraints.getMaxVel()); 
         // m_forwardController.setOutputConstraints(-constraints.getMaxVel(),
         // constraints.getMaxVel()); // Deal with
         // reverse
         m_turnController.setOutputConstraints(-10, 10);
-
+        
         // Get error from end point
         SimPoint error = Robot.m_localizationEngine.getRotatedError(end.getTheta(), end.getX(), end.getY());
         double targetHeading;
@@ -162,7 +162,8 @@ public class Drive extends Subsystem {
 
         // Get gyroscope angle
         // double angle = Gyroscope.getInstance().getGyro().getAngle();
-        double angle = Gyroscope.getInstance().getFusedAngle();
+        // double angle = Gyroscope.getInstance().getFusedAngle();
+        double angle = Robot.m_localizationEngine.getAngle();
 
         // Set setpoint for robot rotation
         m_turnController.setSetpoint(targetHeading);
@@ -172,23 +173,31 @@ public class Drive extends Subsystem {
 
         // Calculate heading error
         double headingError = Math.abs(targetHeading - angle);
+        System.out.println("HD_ERR_PRELIMIT: "+headingError);
         headingError = Math.min(headingError, 90);
 
         // Determine robot movement values
-        double speed = yOutput * (((-1 * headingError) / 90.0) + 1);
+        double speed = yOutput * (((-1 * headingError) / 90.0) + 1); // 
         double rotation = -m_turnController.feed(angle);
 
-        // Calculate motor speeds from arcade-style inputs
-        DriveSignal signal = DriveSignal.fromArcadeInputs(speed, rotation, DriveType.VELOCITY);
+        System.out.println("SPD: " + speed);
+        System.out.println("RTA: "+ rotation );
 
-        // Follow the signal
-        rawDrive(signal);
+        // Calculate motor speeds from arcade-style inputs
+        // DriveSignal signal = DriveSignal.fromArcadeInputs(speed, rotation, DriveType.VELOCITY);
+
+        // // Follow the signal
+        // rawDrive(signal);
+
+        m_differentialDrive.arcadeDrive(speed, rotation);
 
         // Check if the point has been reached
         double distance = error.getY();
         boolean finished = false;
-        System.out.println(distance);
-        System.out.println(m_leftGearbox.getTicks());
+        System.out.println("DIST:" +distance);
+
+        System.out.println("ERR: " + error);
+        System.out.println("HD_ERR: "+ headingError);
 
         // Check if the PID range is within epsilon
         if (constraints.getMinVel() <= 0.5) {
