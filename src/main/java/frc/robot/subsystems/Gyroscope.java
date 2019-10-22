@@ -3,13 +3,16 @@ package frc.robot.subsystems;
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.wpilibj.SPI.Port;
+import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.lib5k.utils.RobotLogger;
 import frc.lib5k.utils.RobotLogger.Level;
 
-public class Gyroscope {
+public class Gyroscope extends Subsystem{
     static Gyroscope m_instance = null;
     RobotLogger logger = RobotLogger.getInstance();
+
+    double angle, prev_angle = 0.0;
 
     AHRS m_gyro;
 
@@ -21,6 +24,17 @@ public class Gyroscope {
 
         Shuffleboard.getTab("DriverStation").add(m_gyro);
 
+    }
+
+    @Override
+    public void periodic() {
+        double diff = m_gyro.getFusedHeading() - prev_angle;
+		if (diff > 180) {
+			angle -= 360;
+		} else if (diff < -180) {
+			angle += 360;
+		}
+		prev_angle += diff;
     }
 
     public static Gyroscope getInstance() {
@@ -49,6 +63,22 @@ public class Gyroscope {
 
     public double getAutonOffset() {
         return autonOffset;
+    }
+
+    public double getFusedAngle() {
+		return 180 - (angle + m_gyro.getFusedHeading());
+	}
+
+    public void reset() {
+        m_gyro.reset();
+        angle = 90 - m_gyro.getFusedHeading();
+		prev_angle = m_gyro.getFusedHeading();
+    }
+
+    @Override
+    protected void initDefaultCommand() {
+        // TODO Auto-generated method stub
+
     }
 
 }

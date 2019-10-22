@@ -26,6 +26,7 @@ public class Robot extends TimedRobot {
 	public static Drive m_drive = new Drive();
 	public static LocalizationEngine m_localizationEngine = new LocalizationEngine();
 	public static OI m_oi;
+	public static Gyroscope m_gyro = Gyroscope.getInstance();
 
 	/* Commands */
 	DriveControl m_driveControl;
@@ -49,6 +50,13 @@ public class Robot extends TimedRobot {
 
 		m_chooser = new Chooser();
 
+		logger.start(0.02);
+
+		// Init sensors
+		Gyroscope.getInstance().getGyro().reset();
+		Gyroscope.getInstance().setAutonOffset();
+		m_drive.zeroEncoders();
+
 	}
 
 	/**
@@ -68,6 +76,8 @@ public class Robot extends TimedRobot {
 		// Reduce network stress by disabling default telem. If LiveWindow is needed,
 		// reboot bot, then start Test Mode
 		LiveWindow.disableAllTelemetry();
+
+		m_drive.setBrakes(true);
 	}
 
 	/**
@@ -77,6 +87,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void disabledInit() {
+		m_drive.setBrakes(false);
 	}
 
 	@Override
@@ -104,9 +115,11 @@ public class Robot extends TimedRobot {
 		Gyroscope.getInstance().getGyro().reset();
 		Gyroscope.getInstance().setAutonOffset();
 		m_drive.zeroEncoders();
+		m_drive.stop();
 
 		// Read selected autonomous mode
 		m_autonomousCommand = m_chooser.getAutonomousCommand();
+		// m_autonomousCommand.start();
 
 		// Try to start the command
 		if (m_autonomousCommand != null) {
@@ -121,6 +134,7 @@ public class Robot extends TimedRobot {
 	@Override
 	public void autonomousPeriodic() {
 		Scheduler.getInstance().run();
+
 	}
 
 	@Override

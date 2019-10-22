@@ -18,11 +18,17 @@ public class Constants {
 
         public static final int maxVelocity = 0; // Ticks per 100ms
 
-        public static PIDProfile driftCorrectionGains = new PIDProfile(1.0, 0.0, 0.0);
+        // public static PIDProfile driftCorrectionGains = new PIDProfile(1.0, 0.0,
+        // 0.0);
         public static PIDProfile forwardPIDGains = new PIDProfile(1.0, 0.0, 0.0);
-        public static PIDProfile turnPIDGains = new PIDProfile(1.0, 0.0, 0.0);
+        // public static PIDProfile turnPIDGains = new PIDProfile(0.05, 0.0, 0.0);
+        // public static PIDProfile turnPIDGains = new PIDProfile(.6 * 0.05, 1.2 * 0.05
+        // / 1, 3 * 0.05 * 1 / 40);
 
-        public static final int ticksPerRotation = 360;
+        // Auto-gen a PID profile, then use the modifier to make any needed edits
+        public static PIDProfile turnPIDGains = PIDProfile.autoConfig(0.05, 1).modify(new PIDProfile(0, 0, 0));
+
+        public static final int ticksPerRotation = 720;// 1440; // 360;
     }
 
     public static class Robot {
@@ -34,9 +40,8 @@ public class Constants {
 
     public class Deadbands {
         public static final double rotation_deadband = 0.1;
-        public static final double roataion_percision = 0.2;
+        public static final double roataion_percision = 0.0;
         public static final double speed_percision = 0.1;
-        public static final double slider_deadband = 0.1;
     }
 
     /* DriveControl */
