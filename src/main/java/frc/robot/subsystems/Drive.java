@@ -174,10 +174,11 @@ public class Drive extends Subsystem {
         // Calculate heading error
         double headingError = Math.abs(targetHeading - angle);
         System.out.println("HD_ERR_PRELIMIT: "+headingError);
-        headingError = Math.min(headingError, 90);
+        // headingError = Math.min(headingError, 90);
 
         // Determine robot movement values
-        double speed = yOutput * (((-1 * headingError) / 90.0) + 1); // 
+        double push_factor = Math.max(0, (((-1 * headingError) / 90.0) + 1));
+        double speed = yOutput * push_factor; // 
         double rotation = -m_turnController.feed(angle);
 
         System.out.println("SPD: " + speed);

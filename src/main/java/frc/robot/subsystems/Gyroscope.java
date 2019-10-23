@@ -54,7 +54,8 @@ public class Gyroscope extends Subsystem{
      * autonomous. Never call this unless it is form Robot.autonomousInit()
      */
     public void setAutonOffset() {
-        autonOffset = m_gyro.getAngle();
+        // autonOffset = 
+        getAngle();
     }
 
     public void overrideAutonOffset(double angle) {
@@ -65,8 +66,8 @@ public class Gyroscope extends Subsystem{
         return autonOffset;
     }
 
-    public double getFusedAngle() {
-		return 180 - (angle + m_gyro.getFusedHeading());
+    public double getAngle() {
+		return (180 - (angle + m_gyro.getFusedHeading())) ;
 	}
 
     public void reset() {
@@ -77,7 +78,6 @@ public class Gyroscope extends Subsystem{
 
     @Override
     protected void initDefaultCommand() {
-        // TODO Auto-generated method stub
 
     }
 

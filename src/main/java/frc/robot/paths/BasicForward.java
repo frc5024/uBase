@@ -6,9 +6,14 @@ import frc.lib5k.kinematics.FieldPosition;
 import frc.robot.autonomous.actions.DriveToPoint;
 import frc.robot.autonomous.actions.SetRobotLocation;
 
+/**
+ * REMEMBER to add 90 to every angle. This is field-relative
+ */
 public class BasicForward extends CommandGroup {
+
+    
     public BasicForward() {
-        addSequential(new SetRobotLocation(new FieldPosition(0, 0, 90)));
+        addSequential(new SetRobotLocation(new FieldPosition(0, 0, 0)));
         addSequential(new DriveToPoint(new FieldPosition(0, 2, 0), new DriveConstraints(0, 0.2), 3.0, 0.1, 3.0));
     }
 }

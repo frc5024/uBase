@@ -43,7 +43,10 @@ public class LocalizationEngine extends Subsystem {
         // TODO: Not sure which one of these lines is correct
         // gyroAngle = m_gyroInstance.getAngle() +
         // (Gyroscope.getInstance().getAutonOffset() - 90);
-        gyroAngle = Gyroscope.getInstance().getFusedAngle() + (Gyroscope.getInstance().getAutonOffset() - 90);
+        gyroAngle = Gyroscope.getInstance().getAngle() +
+        (Gyroscope.getInstance().getAutonOffset() - 90);
+        // gyroAngle = Gyroscope.getInstance().getFusedAngle() - Gyroscope.getInstance().getAutonOffset();
+
         // double gyroAngle = m_gyroInstance.getAngle() -
         // Gyroscope.getInstance().getAutonOffset();
 
@@ -73,7 +76,7 @@ public class LocalizationEngine extends Subsystem {
         yPos += ySpeed * timeDelta / 1000.0;
 
         // System.out.println("" + xPos + ", " + yPos + " " + xSpeed);
-        // System.out.println(getRobotPosition().toString());
+        System.out.println(getRobotPosition().toString());
     }
 
     public double getXPos() {
