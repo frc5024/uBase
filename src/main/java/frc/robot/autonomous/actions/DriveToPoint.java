@@ -3,10 +3,13 @@ package frc.robot.autonomous.actions;
 import edu.wpi.first.wpilibj.command.TimedCommand;
 import frc.lib5k.kinematics.DriveConstraints;
 import frc.lib5k.kinematics.FieldPosition;
+import frc.lib5k.utils.RobotLogger;
 import frc.robot.Constants;
 import frc.robot.Robot;
 
 public class DriveToPoint extends TimedCommand {
+    RobotLogger logger = RobotLogger.getInstance();
+
     private FieldPosition position;
     private DriveConstraints constraints;
     private double turnRate, epsilon;
@@ -29,7 +32,6 @@ public class DriveToPoint extends TimedCommand {
         this.turnRate = turnRate;
         this.epsilon = epsilon;
 
-
         requires(Robot.m_drive);
 
     }
@@ -37,7 +39,8 @@ public class DriveToPoint extends TimedCommand {
     @Override
     protected void initialize() {
         finished = false;
-        System.out.println("Starting movement");
+        logger.log("[DriveToPoint] Starting to follow path to " + position.toString() + " with a max turn rate of "
+                + constraints.getMaxTurn() + " and an epsilon of " + epsilon);
     }
 
     @Override
@@ -49,17 +52,14 @@ public class DriveToPoint extends TimedCommand {
     @Override
     protected boolean isFinished() {
         if (finished) {
-            System.out.println("Finish movement");
+            logger.log("[DriveToPoint] Reached point");
         }
         return isTimedOut() || finished;
     }
 
     @Override
     protected void end() {
-        boolean brakes = Robot.m_drive.getBrakes();
-        Robot.m_drive.setBrakes(false);
         Robot.m_drive.stop();
-        Robot.m_drive.setBrakes(brakes);
     }
 
 }
