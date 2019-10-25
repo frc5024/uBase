@@ -5,25 +5,27 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib5k.components.EncoderBase;
 import frc.lib5k.components.GearBox;
 import frc.lib5k.components.GearBoxEncoder;
-import frc.lib5k.control.PID;
-import frc.lib5k.control.PIDv2;
 import frc.lib5k.control.SlewLimiter;
 import frc.lib5k.kinematics.DriveConstraints;
 import frc.lib5k.kinematics.DriveSignal;
 import frc.lib5k.kinematics.FieldPosition;
+import frc.lib5k.kinematics.MovementPlanner;
+import frc.lib5k.kinematics.MovementSegment;
 import frc.lib5k.kinematics.DriveSignal.DriveType;
+import frc.lib5k.spatial.LocalizationEngine;
 import frc.lib5k.utils.RobotLogger;
 import frc.lib5k.utils.RobotLogger.Level;
 import frc.robot.Constants;
-import frc.robot.Robot;
 import frc.robot.commands.DriveControl;
-import frc.team1114.SimPoint; 
 
+/**
+ * Handles control of the drivebase, tracking the robot's position, and
+ * autonomous movement
+ */
 public class Drive extends Subsystem {
 
     // public enum ControlType {
@@ -36,7 +38,6 @@ public class Drive extends Subsystem {
     GearBox m_rightGearbox;
 
     DifferentialDrive m_differentialDrive;
-    PID m_driveCorrector;
     SlewLimiter m_speedSlew;
 
     boolean m_driftCorrectionActive = false;
@@ -44,13 +45,12 @@ public class Drive extends Subsystem {
     boolean m_isNewConfigData = false;
 
     NeutralMode m_desiredBrakeMode = NeutralMode.Coast;
-    private int m_leftEncoderOffset, m_rightEncoderOffset = 0;
 
     // ControlType m_currentControlType = ControlType.DEFAULT;
 
-    // PID controllers for pathing
-    PIDv2 m_forwardController;
-    PIDv2 m_turnController;
+    /* Autonomous controllers */
+    MovementPlanner m_movementPlanner;
+    LocalizationEngine m_localizationEngine;
 
     // Encoders
     EncoderBase m_leftEncoder;
@@ -77,23 +77,21 @@ public class Drive extends Subsystem {
         m_leftGearbox.getMaster().setSafetyEnabled(false);
         m_rightGearbox.getMaster().setSafetyEnabled(false);
 
-        // Configure drift PID controller
-        m_driveCorrector = new PID(Constants.DriveTrain.turnPIDGains);
-
         // Configure Slew limiter
         m_speedSlew = new SlewLimiter(Constants.accelerationStep);
-
-        // Configure PID controllers for pathing
-        m_forwardController = new PIDv2(Constants.DriveTrain.forwardPIDGains);
-        m_turnController = new PIDv2(Constants.DriveTrain.turnPIDGains);
 
         // Configure encoders
         m_leftEncoder = new GearBoxEncoder(m_leftGearbox);
         m_rightEncoder = new GearBoxEncoder(m_rightGearbox);
 
-        // Send PID controllers
-        Shuffleboard.getTab("DriverStation").add("ForwardPID", m_forwardController);
-        Shuffleboard.getTab("DriverStation").add("TurnPID", m_turnController);
+        // Configure Autonomous controllers
+        m_movementPlanner = new MovementPlanner(Constants.DriveTrain.forwardPIDGains,
+                Constants.DriveTrain.turnPIDGains);
+        m_localizationEngine = LocalizationEngine.getInstance();
+
+        // Publish MovementPlanner PIDControllers
+        m_movementPlanner.publishPIDControllers();
+
     }
 
     @Override
@@ -115,6 +113,16 @@ public class Drive extends Subsystem {
             m_isNewConfigData = false;
         }
 
+        // Read encoder positions
+        double leftMeters = m_leftEncoder.getMeters(Constants.DriveTrain.ticksPerRotation, Constants.Robot.wheelCirc);
+        double rightMeters = m_rightEncoder.getMeters(Constants.DriveTrain.ticksPerRotation, Constants.Robot.wheelCirc);
+
+        // Read robot heading
+        double heading = Gyroscope.getInstance().getGyro().getAngle();
+
+        // Update the LocalizationEngine
+        m_localizationEngine.calculate(leftMeters, rightMeters, heading);
+
         // Output telemetry data
         outputTelemetry();
 
@@ -134,86 +142,15 @@ public class Drive extends Subsystem {
      */
     public boolean driveTo(FieldPosition end, DriveConstraints constraints, double turnRate, double epsilon) {
 
-        // Configure PID constraints
-        m_forwardController.setOutputConstraints(constraints.getMinVel(), constraints.getMaxVel()); 
-        // m_forwardController.setOutputConstraints(-constraints.getMaxVel(),
-        // constraints.getMaxVel()); // Deal with
-        // reverse
-        m_turnController.setOutputConstraints(-10, 10);
-        
-        // Get error from end point
-        SimPoint error = Robot.m_localizationEngine.getRotatedError(end.getTheta(), end.getX(), end.getY());
-        double targetHeading;
+        // Read the MovementPlanner's MovementSegment
+        MovementSegment segment = m_movementPlanner.compute(end, constraints, turnRate, epsilon);
 
-        // Flip X if we are driving backwards
-        if (error.getY() < 0) {
-            error.setX(-error.getX());
-        }
+        // Send segment data to motors
+        m_differentialDrive.arcadeDrive(segment.getSpeed(), segment.getTurn());
 
-        // Increase turning aggression based on path progress
-        double turnOffset = (error.getX() * turnRate);
-
-        // Bind the turnOffset to the maximum turn rate
-        turnOffset = Math.max(-constraints.getMaxTurn(), turnOffset);
-        turnOffset = Math.min(constraints.getMaxTurn(), turnOffset);
-
-        // Calculate target heading
-        targetHeading = end.getTheta() - turnOffset;
-
-        // Get gyroscope angle
-        // double angle = Gyroscope.getInstance().getGyro().getAngle();
-        // double angle = Gyroscope.getInstance().getFusedAngle();
-        double angle = Robot.m_localizationEngine.getAngle();
-
-        // Set setpoint for robot rotation
-        m_turnController.setSetpoint(targetHeading);
-
-        // Calculate Y's PID value
-        double yOutput = m_forwardController.calculate(error.getY());
-
-        // Calculate heading error
-        double headingError = Math.abs(targetHeading - angle);
-        System.out.println("HD_ERR_PRELIMIT: "+headingError);
-        // headingError = Math.min(headingError, 90);
-
-        // Determine robot movement values
-        double push_factor = Math.max(0, (((-1 * headingError) / 90.0) + 1));
-        double speed = yOutput * push_factor; // 
-        double rotation = -m_turnController.feed(angle);
-
-        System.out.println("SPD: " + speed);
-        System.out.println("RTA: "+ rotation );
-
-        // Calculate motor speeds from arcade-style inputs
-        // DriveSignal signal = DriveSignal.fromArcadeInputs(speed, rotation, DriveType.VELOCITY);
-
-        // // Follow the signal
-        // rawDrive(signal);
-
-        m_differentialDrive.arcadeDrive(speed, rotation);
-
-        // Check if the point has been reached
-        double distance = error.getY();
-        boolean finished = false;
-        System.out.println("DIST:" +distance);
-
-        System.out.println("ERR: " + error);
-        System.out.println("HD_ERR: "+ headingError);
-
-        // Check if the PID range is within epsilon
-        if (constraints.getMinVel() <= 0.5) {
-            if (m_forwardController.isFinished(epsilon)) { // Bug here
-                stop();
-                finished = true;
-                System.out.println("Finished from epsilon");
-
-            }
-        } else if (Math.abs(distance) < epsilon) {
-            finished = true;
-            System.out.println("Finished from distance");
-        }
-
-        return finished;
+        // Return weather or not the segment is finished (has the robot reached the end
+        // point)
+        return segment.isFinished();
     }
 
     /**
@@ -225,27 +162,32 @@ public class Drive extends Subsystem {
      * 
      * @return Has the action finished?
      */
-    public boolean turnTo(double angle, DriveConstraints constraints, double epsilon) {
-        // Get turn output
-        double rotation = -m_turnController.feed(Gyroscope.getInstance().getGyro().getAngle());
+    // TODO: This can probably be implemented by calling driveTo with an end point
+    // equal to the current, but a new theta
+    // public boolean turnTo(double angle, DriveConstraints constraints, double
+    // epsilon) {
+    // // Get turn output
+    // double rotation =
+    // -m_turnController.feed(Gyroscope.getInstance().getGyro().getAngle());
 
-        // Bind output
-        rotation = Math.max(rotation, -constraints.getMaxTurn());
-        rotation = Math.min(rotation, constraints.getMaxTurn());
+    // // Bind output
+    // rotation = Math.max(rotation, -constraints.getMaxTurn());
+    // rotation = Math.min(rotation, constraints.getMaxTurn());
 
-        // Determine if the action has finished
-        if (m_turnController.isFinished(epsilon)) {
-            // PID finished
-            stop();
-            return true;
-        }
+    // // Determine if the action has finished
+    // if (m_turnController.isFinished(epsilon)) {
+    // // PID finished
+    // stop();
+    // return true;
+    // }
 
-        // Send drive signal
-        DriveSignal signal = DriveSignal.fromArcadeInputs(0.0, rotation, DriveType.STANDARD);
-        rawDrive(signal);
+    // // Send drive signal
+    // DriveSignal signal = DriveSignal.fromArcadeInputs(0.0, rotation,
+    // DriveType.STANDARD);
+    // rawDrive(signal);
 
-        return false;
-    }
+    // return false;
+    // }
 
     /**
      * Drive the robot with some help from sensors
@@ -335,48 +277,6 @@ public class Drive extends Subsystem {
         rawDrive(signal.getL(), signal.getR());
     }
 
-    /**
-     * Get the number of ticks recorded by the left GearBox's encoder.
-     * 
-     * @return Number of ticks
-     */
-    public int getLeftGearboxTicks() {
-        // return m_leftGearbox.getTicks() - m_leftEncoderOffset;
-        return m_leftEncoder.getTicks();
-    }
-
-    /**
-     * Get the number of ticks recorded by the right GearBox's encoder.
-     * 
-     * @return Number of ticks
-     */
-    public int getRightGearboxTicks() {
-        // return m_rightGearbox.getTicks() - m_rightEncoderOffset;
-        return m_rightEncoder.getTicks();
-    }
-
-    /**
-     * Get the distance traveled in meters by the left gearbox
-     * 
-     * @return Distance in meters
-     */
-    public double getLeftGearboxMeters() {
-        // return ((getLeftGearboxTicks() / Constants.DriveTrain.ticksPerRotation) *
-        // Constants.Robot.wheelCirc) / 100.0;
-        return m_leftEncoder.getMeters(Constants.DriveTrain.ticksPerRotation, Constants.Robot.wheelCirc);
-    }
-
-    /**
-     * Get the distance traveled in meters by the right gearbox
-     * 
-     * @return Distance in meters
-     */
-    public double getRightGearboxMeters() {
-        // return ((getRightGearboxTicks() / Constants.DriveTrain.ticksPerRotation) *
-        // Constants.Robot.wheelCirc) / 100.0;
-        return m_rightEncoder.getMeters(Constants.DriveTrain.ticksPerRotation, Constants.Robot.wheelCirc);
-    }
-
     public EncoderBase getLeftEncoder() {
         return m_leftEncoder;
     }
@@ -387,8 +287,8 @@ public class Drive extends Subsystem {
 
     public void outputTelemetry() {
 
-        SmartDashboard.putNumber("[DriveTrain] Left gearbox sensor", getLeftGearboxTicks());
-        SmartDashboard.putNumber("[DriveTrain] Right gearbox sensor", getRightGearboxTicks());
+        SmartDashboard.putNumber("[DriveTrain] Left gearbox sensor", getLeftEncoder().getRawTicks());
+        SmartDashboard.putNumber("[DriveTrain] Right gearbox sensor", getRightEncoder().getRawTicks());
 
     }
 
@@ -404,16 +304,12 @@ public class Drive extends Subsystem {
      */
     public void stop() {
         rawDrive(0, 0);
-        m_forwardController.reset();
-        m_turnController.reset();
     }
 
     /**
      * Reset encoder readings to zero
      */
     public void zeroEncoders() {
-        // m_leftEncoderOffset = m_leftGearbox.getTicks();
-        // m_rightEncoderOffset = m_rightGearbox.getTicks();
 
         m_leftEncoder.zero();
         m_rightEncoder.zero();
