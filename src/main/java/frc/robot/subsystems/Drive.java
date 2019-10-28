@@ -145,8 +145,10 @@ public class Drive extends Subsystem {
         // Read the MovementPlanner's MovementSegment
         MovementSegment segment = m_movementPlanner.compute(end, constraints, turnRate, epsilon);
 
+        // System.out.println(segment);
+
         // Send segment data to motors
-        m_differentialDrive.arcadeDrive(segment.getSpeed(), segment.getTurn());
+        arcadeDrive(segment.getSpeed(), segment.getTurn());
 
         // Return weather or not the segment is finished (has the robot reached the end
         // point)
@@ -233,6 +235,11 @@ public class Drive extends Subsystem {
         // m_differentialDrive.curvatureDrive(speed, rotation, quickTurn);
         m_differentialDrive.arcadeDrive(speed, rotation);
 
+    }
+
+    public void arcadeDrive(double speed, double rotation) {
+        // System.out.println("" + speed + ", " + rotation);
+        m_differentialDrive.arcadeDrive(speed, rotation);
     }
     // double rightSquaredAccel = (rightMPS - lastRightMPS)
 
