@@ -13,6 +13,6 @@ public class BasicForward extends CommandGroup {
 
     public BasicForward() {
         addSequential(new SetRobotLocation(new FieldPosition(0, 0, 0)));
-        addSequential(new DriveToPoint(new FieldPosition(0, 1, 0), new DriveConstraints(0, 0.4, 0.5), 0.2, 0.1, 3.0));
+        addSequential(new DriveToPoint(new FieldPosition(0, 1, 0), new DriveConstraints(0, 0.6, 0.3), 0.2, 0.05, 5.0));
     }
 }
