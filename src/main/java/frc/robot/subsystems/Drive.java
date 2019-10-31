@@ -77,7 +77,7 @@ public class Drive extends Subsystem {
         m_leftGearbox.getMaster().setSafetyEnabled(false);
         m_rightGearbox.getMaster().setSafetyEnabled(false);
 
-        m_differentialDrive.setDeadband(0.05);
+        m_differentialDrive.setDeadband(0.02);
 
         // Configure Slew limiter
         m_speedSlew = new SlewLimiter(Constants.accelerationStep);
