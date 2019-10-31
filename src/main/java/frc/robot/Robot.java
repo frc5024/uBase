@@ -4,13 +4,15 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import frc.lib5k.components.Compass;
+import frc.lib5k.kinematics.FieldPosition;
 import frc.lib5k.utils.RobotLogger;
 import frc.lib5k.utils.RobotLogger.Level;
 import frc.robot.autonomous.Chooser;
 import frc.robot.commands.DriveControl;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Gyroscope;
-import frc.robot.subsystems.LocalizationEngine;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -24,7 +26,6 @@ public class Robot extends TimedRobot {
 
 	/* Subsystems */
 	public static Drive m_drive = new Drive();
-	public static LocalizationEngine m_localizationEngine = new LocalizationEngine();
 	public static OI m_oi;
 	public static Gyroscope m_gyro = Gyroscope.getInstance();
 

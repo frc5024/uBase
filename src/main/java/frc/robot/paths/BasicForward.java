@@ -11,9 +11,9 @@ import frc.robot.autonomous.actions.SetRobotLocation;
  */
 public class BasicForward extends CommandGroup {
 
-    
     public BasicForward() {
         addSequential(new SetRobotLocation(new FieldPosition(0, 0, 0)));
-        addSequential(new DriveToPoint(new FieldPosition(0, 2, 0), new DriveConstraints(0, 0.2), 3.0, 0.1, 3.0));
+        // addSequential(new DriveToPoint(new FieldPosition(0, 2, 0), new DriveConstraints(0, 1.0, 0.1), 0.2, 0.2, 5.0));
+        addSequential(new DriveToPoint(new FieldPosition(0, 0.1, 90), new DriveConstraints(0, 1.0, 0.5), 0.2, 0.0, 5.0));
     }
 }

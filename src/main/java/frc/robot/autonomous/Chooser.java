@@ -34,7 +34,7 @@ public class Chooser {
     public CommandGroup getAutonomousCommand() {
         // Calculate autonomous key from choosers
         int key = m_positionChooser.getSelected() + m_targetChooser.getSelected();
-        System.out.println(key);
+        System.out.println("AUTON Seleciton: "+key);
 
         // Detect commandgroup to use
         switch (key) {

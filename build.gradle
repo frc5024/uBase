@@ -73,6 +73,8 @@ dependencies {
     } else {
         simulation "edu.wpi.first.halsim:halsim_ds_socket:${wpi.wpilibVersion}:${wpi.platforms.desktop}debug@zip"
     }
+
+    // simulation wpi.deps.sim.gui(wpi.platforms.desktop, false)
     
 }
 
