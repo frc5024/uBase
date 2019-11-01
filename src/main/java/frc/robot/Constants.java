@@ -21,6 +21,8 @@ public class Constants {
         // public static PIDProfile driftCorrectionGains = new PIDProfile(1.0, 0.0,
         // 0.0);
         public static PIDProfile forwardPIDGains = new PIDProfile(0.9, 0.0005, 0.0);
+
+        public static PIDProfile motionProfilePID = new PIDProfile(0.9, 0.0005, 0.0);
         // public static PIDProfile turnPIDGains = new PIDProfile(0.05, 0.0, 0.0);
         // public static PIDProfile turnPIDGains = new PIDProfile(.6 * 0.05, 1.2 * 0.05
         // / 1, 3 * 0.05 * 1 / 40);
@@ -35,6 +37,7 @@ public class Constants {
     public static class Robot {
         public static final double wheelDiameter = 6.0 * 2.54; // Wheel is in inches.. Convert to cm
         public static final double wheelCirc = Math.PI * wheelDiameter;
+        public static final double wheelbaseWidth = 50.8;
 
         public static DriveConstraints robotConstraints = new DriveConstraints(0, 5.2); // in m/s
     }
