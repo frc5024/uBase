@@ -29,7 +29,7 @@ public class Constants {
         public static PIDProfile turnPIDGains = new PIDProfile(1.0, 0.0, 0.0);
         // PIDProfile.autoConfig(0.05, 1.2).modify(new PIDProfile(0, 0, 0));
 
-        public static final int ticksPerRotation = 360; // 720;// 1440; // 360;
+        public static final int ticksPerRotation = 360; 
     }
 
     public static class Robot {
