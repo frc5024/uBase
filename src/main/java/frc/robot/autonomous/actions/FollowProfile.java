@@ -25,10 +25,14 @@ public class FollowProfile extends Command {
         m_profiler = new Motionprofiler(m_profile, Constants.DriveTrain.motionProfilePID,
                 Robot.m_drive.getLeftEncoder(), Robot.m_drive.getRightEncoder(), Constants.DriveTrain.ticksPerRotation,
                 Constants.Robot.wheelDiameter, Constants.Robot.wheelbaseWidth, Robot.m_gyro.getGyro()::getAngle);
+
+        requires(Robot.m_drive);
     }
 
     @Override
     protected void initialize() {
+        finished = false;
+        
         // Start the MotionProfiler
         m_profiler.start();
     }
@@ -50,7 +54,7 @@ public class FollowProfile extends Command {
     protected void interrupted() {
         end();
     }
-    
+
     @Override
     protected void end() {
         // Stop the MotionProfiler
@@ -58,7 +62,7 @@ public class FollowProfile extends Command {
 
         // Stop the drivetrain
         Robot.m_drive.stop();
-        
+
     }
 
     @Override

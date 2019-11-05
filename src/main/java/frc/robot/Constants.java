@@ -2,6 +2,7 @@ package frc.robot;
 
 import frc.lib5k.kinematics.DriveConstraints;
 import frc.lib5k.kinematics.PIDProfile;
+import frc.lib5k.kinematics.motionprofiling.MotionConstraints;
 
 public class Constants {
 
@@ -40,6 +41,8 @@ public class Constants {
         public static final double wheelbaseWidth = 50.8;
 
         public static DriveConstraints robotConstraints = new DriveConstraints(0, 5.2); // in m/s
+        public static MotionConstraints robotMotionConstraints = new MotionConstraints(6.0, 4.0,
+                60);
     }
 
     public class Deadbands {
