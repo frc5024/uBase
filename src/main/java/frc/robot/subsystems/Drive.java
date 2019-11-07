@@ -60,6 +60,9 @@ public class Drive extends Subsystem {
     EncoderBase m_leftEncoder;
     EncoderBase m_rightEncoder;
 
+    // Drive speeds
+
+
     public Drive() {
         logger.log("Building drive", Level.kRobot);
 
@@ -311,7 +314,9 @@ public class Drive extends Subsystem {
         m_isMoving = (l + r != 0.0);
         m_isTurning = (l != r);
         m_leftGearbox.set(l);
-        m_rightGearbox.set(r);
+
+        // This needs to be negated
+        m_rightGearbox.set(-r);
     }
 
     public void rawDrive(DriveSignal signal) {

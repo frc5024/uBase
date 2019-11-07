@@ -46,11 +46,12 @@ public class Constants {
     }
 
     public class Deadbands {
-        public static final double rotation_deadband = 0.1;
+        public static final double rotation_deadband = 0.2;
         public static final double roataion_percision = 0.0;
         public static final double speed_percision = 0.1;
     }
 
+    public static final int pcm_led = 0;
     /* DriveControl */
     public static final double accelerationStep = 0.2;
     public static final double pathing_p = 6;
