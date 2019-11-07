@@ -12,6 +12,7 @@ public class GearBox {
 
     private boolean is_inverse_motion, backEncoders = false;
 
+
     /**
      * GearBox Constructor
      * 
@@ -112,4 +113,11 @@ public class GearBox {
     public void set(double speed) {
         this.front.set(speed);
     }
+
+    public GearBoxEncoder wrapEncoder() {
+
+        return new GearBoxEncoder(this);
+
+    }
+
 }
