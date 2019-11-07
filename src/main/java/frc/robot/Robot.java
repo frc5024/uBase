@@ -64,7 +64,7 @@ public class Robot extends TimedRobot {
 		m_drive.zeroEncoders();
 
 		// Connect camera
-		m_camera = new USBVisionCamera("Main camera", 0, Constants.pcm_led);
+		m_camera = new USBVisionCamera("Main camera", 0,8, Constants.pcm_led);
 		m_camera.keepCameraAwake(true);
 
 		m_camera.setLED(USBVisionCamera.LEDMode.BLINK);
