@@ -11,7 +11,7 @@ public class FPGAClock {
      * Get the number of seconds since the robot timer started
      * 
      * @return Seconds since timer start
-     */
+     */ 
     public static double getFPGASeconds() {
         return Timer.getFPGATimestamp();
     }
