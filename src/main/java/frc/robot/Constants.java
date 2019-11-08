@@ -2,6 +2,7 @@ package frc.robot;
 
 import frc.lib5k.kinematics.DriveConstraints;
 import frc.lib5k.kinematics.PIDProfile;
+import frc.lib5k.kinematics.motionprofiling.MotionConstraints;
 
 public class Constants {
 
@@ -21,6 +22,8 @@ public class Constants {
         // public static PIDProfile driftCorrectionGains = new PIDProfile(1.0, 0.0,
         // 0.0);
         public static PIDProfile forwardPIDGains = new PIDProfile(0.9, 0.0005, 0.0);
+
+        public static PIDProfile motionProfilePID = new PIDProfile(0.9, 0.0005, 0.0);
         // public static PIDProfile turnPIDGains = new PIDProfile(0.05, 0.0, 0.0);
         // public static PIDProfile turnPIDGains = new PIDProfile(.6 * 0.05, 1.2 * 0.05
         // / 1, 3 * 0.05 * 1 / 40);
@@ -29,22 +32,26 @@ public class Constants {
         public static PIDProfile turnPIDGains = new PIDProfile(1.0, 0.0, 0.0);
         // PIDProfile.autoConfig(0.05, 1.2).modify(new PIDProfile(0, 0, 0));
 
-        public static final int ticksPerRotation = 360; // 720;// 1440; // 360;
+        public static final int ticksPerRotation = 360; 
     }
 
     public static class Robot {
         public static final double wheelDiameter = 6.0 * 2.54; // Wheel is in inches.. Convert to cm
         public static final double wheelCirc = Math.PI * wheelDiameter;
+        public static final double wheelbaseWidth = 50.8;
 
         public static DriveConstraints robotConstraints = new DriveConstraints(0, 5.2); // in m/s
+        public static MotionConstraints robotMotionConstraints = new MotionConstraints(6.0, 4.0,
+                60);
     }
 
     public class Deadbands {
-        public static final double rotation_deadband = 0.1;
+        public static final double rotation_deadband = 0.2;
         public static final double roataion_percision = 0.0;
         public static final double speed_percision = 0.1;
     }
 
+    public static final int pcm_led = 0;
     /* DriveControl */
     public static final double accelerationStep = 0.2;
     public static final double pathing_p = 6;

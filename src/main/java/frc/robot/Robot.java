@@ -5,7 +5,10 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import frc.lib5k.components.AutoCamera;
 import frc.lib5k.components.Compass;
+import frc.lib5k.components.USBVisionCamera;
+import frc.lib5k.components.Limelight.LEDMode;
 import frc.lib5k.kinematics.FieldPosition;
 import frc.lib5k.utils.RobotLogger;
 import frc.lib5k.utils.RobotLogger.Level;
@@ -37,6 +40,8 @@ public class Robot extends TimedRobot {
 
 	CommandGroup m_autonomousCommand;
 
+	USBVisionCamera m_camera;
+
 	/**
 	 * This function is run when the robot is first started up and should be used
 	 * for any initialization code.
@@ -57,6 +62,12 @@ public class Robot extends TimedRobot {
 		Gyroscope.getInstance().getGyro().reset();
 		Gyroscope.getInstance().setAutonOffset();
 		m_drive.zeroEncoders();
+
+		// Connect camera
+		m_camera = new USBVisionCamera("Main camera", 0,8, Constants.pcm_led);
+		m_camera.keepCameraAwake(true);
+
+		m_camera.setLED(USBVisionCamera.LEDMode.BLINK);
 
 	}
 

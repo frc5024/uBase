@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib5k.components.EncoderBase;
 import frc.lib5k.components.GearBox;
 import frc.lib5k.components.GearBoxEncoder;
+import frc.lib5k.components.RaiderDrive;
+import frc.lib5k.control.CubicDeadband;
 import frc.lib5k.control.SlewLimiter;
 import frc.lib5k.kinematics.DriveConstraints;
 import frc.lib5k.kinematics.DriveSignal;
@@ -40,6 +42,8 @@ public class Drive extends Subsystem {
     DifferentialDrive m_differentialDrive;
     SlewLimiter m_speedSlew;
 
+    RaiderDrive m_raiderDrive;
+
     boolean m_driftCorrectionActive = false;
     boolean m_isMoving, m_isTurning = false;
     boolean m_isNewConfigData = false;
@@ -55,6 +59,9 @@ public class Drive extends Subsystem {
     // Encoders
     EncoderBase m_leftEncoder;
     EncoderBase m_rightEncoder;
+
+    // Drive speeds
+
 
     public Drive() {
         logger.log("Building drive", Level.kRobot);
@@ -76,6 +83,11 @@ public class Drive extends Subsystem {
         m_differentialDrive.setSafetyEnabled(false);
         m_leftGearbox.getMaster().setSafetyEnabled(false);
         m_rightGearbox.getMaster().setSafetyEnabled(false);
+
+        // Set up RaiderDrive
+        m_raiderDrive = new RaiderDrive(new CubicDeadband(0.0, Constants.Deadbands.speed_percision), new CubicDeadband(Constants.Deadbands.rotation_deadband,
+                        Constants.Deadbands.roataion_percision));
+        m_raiderDrive.setRampRate(Constants.accelerationStep);
 
         m_differentialDrive.setDeadband(0.02);
 
@@ -239,6 +251,29 @@ public class Drive extends Subsystem {
 
     }
 
+    public void hybridDrive(double speed, double turn, boolean invertControl) {
+        // Determine DriveSignal
+        DriveSignal signal = m_raiderDrive.computeSemiConst(speed * ((invertControl) ? -1 : 1), turn, true);
+
+        rawDrive(signal);
+
+
+        // // Define a signal
+        // DriveSignal signal = new DriveSignal(0, 0);
+
+        // // Determine appropriate movement calculation for robot
+        // // If robot speed passes the threshold, we should switch to arcs
+        // if (Math.abs(speed) > .5) {
+        //     m_differentialDrive.curvatureDrive(speed * ((invertControl) ? -1 : 1), turn, false);
+        // } else {
+        //     smoothDrive(speed, turn, false, invertControl);
+        // }
+
+        // Execute the signal
+        // rawDrive(signal);
+
+    }
+
     public void arcadeDrive(double speed, double rotation) {
         // System.out.println("" + speed + ", " + rotation);
         m_differentialDrive.arcadeDrive(speed, rotation);
@@ -279,7 +314,9 @@ public class Drive extends Subsystem {
         m_isMoving = (l + r != 0.0);
         m_isTurning = (l != r);
         m_leftGearbox.set(l);
-        m_rightGearbox.set(r);
+
+        // This needs to be negated
+        m_rightGearbox.set(-r);
     }
 
     public void rawDrive(DriveSignal signal) {
@@ -313,6 +350,7 @@ public class Drive extends Subsystem {
      */
     public void stop() {
         rawDrive(0, 0);
+        m_raiderDrive.reset();
     }
 
     /**

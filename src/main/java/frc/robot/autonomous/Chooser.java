@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import frc.robot.paths.BasicForward;
+import frc.robot.paths.PlannedForward;
 
 /**
  * Reads inputs from smartdashboard to determine correct auto to run
@@ -25,6 +26,7 @@ public class Chooser {
         m_targetChooser.setName("Autonomous target");
         m_targetChooser.setDefaultOption("Do nothing", 0);
         m_targetChooser.addOption("Forward 2 Meters", 10);
+        m_targetChooser.addOption("Forward 2 Meters (pre-planned)", 20);
 
         // Push choosers to dashboard
         Shuffleboard.getTab("DriverStation").add(m_positionChooser);
@@ -40,6 +42,8 @@ public class Chooser {
         switch (key) {
         case 10:
             return new BasicForward();
+        case 20:
+            return new PlannedForward();
         default:
             break;
         }
