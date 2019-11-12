@@ -1,6 +1,7 @@
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2019.4.1"
+    
     // id "edu.wpi.first.GradleRIO" version "2020.1.1"
 }
 
@@ -75,6 +76,10 @@ dependencies {
     }
 
     // simulation wpi.deps.sim.gui(wpi.platforms.desktop, false)
+
+    // SimpleMatrix
+    compile group: 'org.ejml', name: 'ejml-simple', version: '0.38'
+
     
 }
 
