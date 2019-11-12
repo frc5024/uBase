@@ -23,6 +23,10 @@ import frc.lib5k.utils.RobotLogger;
 import frc.lib5k.utils.RobotLogger.Level;
 import frc.robot.Constants;
 import frc.robot.commands.DriveControl;
+import wpi2020.geometry.Pose2d;
+import wpi2020.geometry.Rotation2d;
+import wpi2020.kinematics.DifferentialDriveOdometry;
+import wpi2020.kinematics.DifferentialDriveWheelSpeeds;
 
 /**
  * Handles control of the drivebase, tracking the robot's position, and
@@ -55,6 +59,8 @@ public class Drive extends Subsystem {
     /* Autonomous controllers */
     // MovementPlanner m_movementPlanner;
     // LocalizationEngine m_localizationEngine;
+    DifferentialDriveOdometry m_odometry;
+    Pose2d m_currentPose = new Pose2d(0., 0., new Rotation2d(0.0));
 
     // Encoders
     EncoderBase m_leftEncoder;
@@ -105,6 +111,8 @@ public class Drive extends Subsystem {
         // // Publish MovementPlanner PIDControllers
         // m_movementPlanner.publishPIDControllers();
 
+        m_odometry = new DifferentialDriveOdometry(Constants.Robot.robotKinematics);
+
     }
 
     @Override
@@ -126,6 +134,14 @@ public class Drive extends Subsystem {
             m_isNewConfigData = false;
         }
 
+        // Update Odometry
+        var wheelSpeeds = new DifferentialDriveWheelSpeeds(
+                getLeftEncoder().getRate(Constants.Robot.wheelCirc, Constants.DriveTrain.ticksPerRotation),
+                getRightEncoder().getRate(Constants.Robot.wheelCirc, Constants.DriveTrain.ticksPerRotation));
+        Rotation2d angle = Rotation2d.fromDegrees(Gyroscope.getInstance().getGyro().getAngle());
+
+        m_currentPose = m_odometry.update(angle, wheelSpeeds);
+
         // // Read encoder positions
         // double leftMeters =
         // m_leftEncoder.getMeters(Constants.DriveTrain.ticksPerRotation,
@@ -145,6 +161,14 @@ public class Drive extends Subsystem {
 
     }
 
+    public void resetRobotPose(Pose2d pose) {
+        m_odometry.resetPosition(pose);
+    }
+
+    public Pose2d getRobotPose(){
+        return m_currentPose;
+    }
+
     /**
      * Drive the robot to a relative point in space. Note: If driving backwards, the
      * minimum velocity must be less than 0
@@ -160,7 +184,8 @@ public class Drive extends Subsystem {
     public boolean driveTo(FieldPosition end, DriveConstraints constraints, double turnRate, double epsilon) {
 
         // Read the MovementPlanner's MovementSegment
-        // MovementSegment segment = m_movementPlanner.compute(end, constraints, turnRate, epsilon);
+        // MovementSegment segment = m_movementPlanner.compute(end, constraints,
+        // turnRate, epsilon);
 
         // System.out.println(segment);
 

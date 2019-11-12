@@ -3,6 +3,7 @@ package frc.robot;
 import frc.lib5k.kinematics.DriveConstraints;
 import frc.lib5k.kinematics.PIDProfile;
 import frc.lib5k.kinematics.motionprofiling.MotionConstraints;
+import wpi2020.kinematics.DifferentialDriveKinematics;
 
 public class Constants {
 
@@ -43,6 +44,9 @@ public class Constants {
         public static DriveConstraints robotConstraints = new DriveConstraints(0, 5.2); // in m/s
         public static MotionConstraints robotMotionConstraints = new MotionConstraints(6.0, 4.0,
                 60);
+
+        // Define drivebase kinematics with wheelbase width in meters (20 inches)
+        public static DifferentialDriveKinematics robotKinematics = new DifferentialDriveKinematics(0.508);
     }
 
     public class Deadbands {

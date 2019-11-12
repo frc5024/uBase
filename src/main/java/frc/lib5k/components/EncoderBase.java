@@ -11,6 +11,8 @@ public abstract class EncoderBase {
 
     public abstract int getRawTicks();
 
+    public abstract double getRate(double wheelcirc, double tpr);
+
     public int getTicks() {
         return getRawTicks() - encoder_offset;
     }
@@ -62,5 +64,7 @@ public abstract class EncoderBase {
         pastSpeeds.add(speed);
 
     }
+
+
 
 }

@@ -14,4 +14,9 @@ public class TalonEncoder extends EncoderBase {
         return talon.getSelectedSensorPosition();
     }
     
+    @Override
+    public double getRate(double wheelcirc, double tpr) {
+        // TODO Auto-generated method stub
+        return 0;
+    }
 }

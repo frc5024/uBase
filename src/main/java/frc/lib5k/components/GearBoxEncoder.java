@@ -12,4 +12,9 @@ public class GearBoxEncoder extends EncoderBase {
         return box.getTicks();
     }
 
+    @Override
+    public double getRate(double wheelcirc, double tpr) {
+        return ((box.getMaster().getSelectedSensorVelocity() / tpr) * wheelcirc) * 10;
+    }
+
 }
