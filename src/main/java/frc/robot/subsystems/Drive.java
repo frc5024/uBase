@@ -53,15 +53,14 @@ public class Drive extends Subsystem {
     // ControlType m_currentControlType = ControlType.DEFAULT;
 
     /* Autonomous controllers */
-    MovementPlanner m_movementPlanner;
-    LocalizationEngine m_localizationEngine;
+    // MovementPlanner m_movementPlanner;
+    // LocalizationEngine m_localizationEngine;
 
     // Encoders
     EncoderBase m_leftEncoder;
     EncoderBase m_rightEncoder;
 
     // Drive speeds
-
 
     public Drive() {
         logger.log("Building drive", Level.kRobot);
@@ -85,8 +84,8 @@ public class Drive extends Subsystem {
         m_rightGearbox.getMaster().setSafetyEnabled(false);
 
         // Set up RaiderDrive
-        m_raiderDrive = new RaiderDrive(new CubicDeadband(0.0, Constants.Deadbands.speed_percision), new CubicDeadband(Constants.Deadbands.rotation_deadband,
-                        Constants.Deadbands.roataion_percision));
+        m_raiderDrive = new RaiderDrive(new CubicDeadband(0.0, Constants.Deadbands.speed_percision),
+                new CubicDeadband(Constants.Deadbands.rotation_deadband, Constants.Deadbands.roataion_percision));
         m_raiderDrive.setRampRate(Constants.accelerationStep);
 
         m_differentialDrive.setDeadband(0.02);
@@ -99,12 +98,12 @@ public class Drive extends Subsystem {
         m_rightEncoder = new GearBoxEncoder(m_rightGearbox);
 
         // Configure Autonomous controllers
-        m_movementPlanner = new MovementPlanner(Constants.DriveTrain.forwardPIDGains,
-                Constants.DriveTrain.turnPIDGains);
-        m_localizationEngine = LocalizationEngine.getInstance();
+        // m_movementPlanner = new MovementPlanner(Constants.DriveTrain.forwardPIDGains,
+        // Constants.DriveTrain.turnPIDGains);
+        // m_localizationEngine = LocalizationEngine.getInstance();
 
-        // Publish MovementPlanner PIDControllers
-        m_movementPlanner.publishPIDControllers();
+        // // Publish MovementPlanner PIDControllers
+        // m_movementPlanner.publishPIDControllers();
 
     }
 
@@ -127,15 +126,19 @@ public class Drive extends Subsystem {
             m_isNewConfigData = false;
         }
 
-        // Read encoder positions
-        double leftMeters = m_leftEncoder.getMeters(Constants.DriveTrain.ticksPerRotation, Constants.Robot.wheelCirc);
-        double rightMeters = m_rightEncoder.getMeters(Constants.DriveTrain.ticksPerRotation, Constants.Robot.wheelCirc);
+        // // Read encoder positions
+        // double leftMeters =
+        // m_leftEncoder.getMeters(Constants.DriveTrain.ticksPerRotation,
+        // Constants.Robot.wheelCirc);
+        // double rightMeters =
+        // m_rightEncoder.getMeters(Constants.DriveTrain.ticksPerRotation,
+        // Constants.Robot.wheelCirc);
 
-        // Read robot heading
-        double heading = Gyroscope.getInstance().getGyro().getAngle();
+        // // Read robot heading
+        // double heading = Gyroscope.getInstance().getGyro().getAngle();
 
-        // Update the LocalizationEngine
-        m_localizationEngine.calculate(leftMeters, rightMeters, heading);
+        // // Update the LocalizationEngine
+        // m_localizationEngine.calculate(leftMeters, rightMeters, heading);
 
         // Output telemetry data
         outputTelemetry();
@@ -157,16 +160,17 @@ public class Drive extends Subsystem {
     public boolean driveTo(FieldPosition end, DriveConstraints constraints, double turnRate, double epsilon) {
 
         // Read the MovementPlanner's MovementSegment
-        MovementSegment segment = m_movementPlanner.compute(end, constraints, turnRate, epsilon);
+        // MovementSegment segment = m_movementPlanner.compute(end, constraints, turnRate, epsilon);
 
         // System.out.println(segment);
 
         // Send segment data to motors
-        arcadeDrive(segment.getSpeed(), segment.getTurn());
+        // arcadeDrive(segment.getSpeed(), segment.getTurn());
 
         // Return weather or not the segment is finished (has the robot reached the end
         // point)
-        return segment.isFinished();
+        // return segment.isFinished();
+        return true;
     }
 
     /**
@@ -208,32 +212,11 @@ public class Drive extends Subsystem {
     /**
      * Drive the robot with some help from sensors
      * 
-     * @param speed     Desired robot speed
-     * @param rotation  Desired robot turn rate
-     * @param quickTurn Should quickTurn be enabled?
+     * @param speed         Desired robot speed
+     * @param rotation      Desired robot turn rate
+     * @param invertControl Should the controls swap?
      */
-    public void smoothDrive(double speed, double rotation, boolean quickTurn, boolean invertControl) {
-
-        // Check if we should be correcting robot drift
-        // if (rotation == 0.0 && Math.abs(speed) > 0.05) {
-        // double current_angle = Gyroscope.getInstance().getGyro().getAngle();
-
-        // // Set drift correction and reset setpoint if this state is new
-        // if (!m_driftCorrectionActive) {
-
-        // m_driveCorrector.reset();
-        // m_driveCorrector.setSetpoint(current_angle);
-
-        // // Set state
-        // m_driftCorrectionActive = true;
-        // }
-
-        // // Determine rotation correction
-        // rotation = m_driveCorrector.feed(current_angle);
-        // } else {
-        // // Disable drift correction
-        // m_driftCorrectionActive = false;
-        // }
+    public void smoothDrive(double speed, double rotation, boolean invertControl) {
 
         // Handle inverse control
         speed = (invertControl) ? speed * -1 : speed;
@@ -251,34 +234,10 @@ public class Drive extends Subsystem {
 
     }
 
-    public void hybridDrive(double speed, double turn, boolean invertControl) {
-        // Determine DriveSignal
-        DriveSignal signal = m_raiderDrive.computeSemiConst(speed * ((invertControl) ? -1 : 1), turn, true);
-
-        rawDrive(signal);
-
-
-        // // Define a signal
-        // DriveSignal signal = new DriveSignal(0, 0);
-
-        // // Determine appropriate movement calculation for robot
-        // // If robot speed passes the threshold, we should switch to arcs
-        // if (Math.abs(speed) > .5) {
-        //     m_differentialDrive.curvatureDrive(speed * ((invertControl) ? -1 : 1), turn, false);
-        // } else {
-        //     smoothDrive(speed, turn, false, invertControl);
-        // }
-
-        // Execute the signal
-        // rawDrive(signal);
-
-    }
-
     public void arcadeDrive(double speed, double rotation) {
         // System.out.println("" + speed + ", " + rotation);
         m_differentialDrive.arcadeDrive(speed, rotation);
     }
-    // double rightSquaredAccel = (rightMPS - lastRightMPS)
 
     /**
      * Enables or disables brake mode on all drivebase talons.
@@ -299,10 +258,6 @@ public class Drive extends Subsystem {
     public boolean getBrakes() {
         return m_desiredBrakeMode == NeutralMode.Brake;
     }
-
-    // public void setMode(ControlType type) {
-    // m_currentControlType = type;
-    // }
 
     /**
      * Directly drive the gearboxes. This should only be used wile motion profiling
