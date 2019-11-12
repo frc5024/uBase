@@ -53,14 +53,14 @@ public class DriveControl extends Command {
 
         // Pass data through deadbands
         // speed = m_speedDeadband.feed(speed);
-        // rotation = m_rotationDeadband.feed(rotation);
+        rotation = m_rotationDeadband.feed(rotation);
 
         // Limit rotation
         rotation = (quickTurn) ? rotation : rotation * .9;
 
         // Send movement speeds to DriveTrain
-        // Robot.m_drive.smoothDrive(speed, rotation, quickTurn, m_shouldInvertControl);
-        Robot.m_drive.hybridDrive(speed, rotation, m_shouldInvertControl);
+        Robot.m_drive.smoothDrive(speed, rotation, quickTurn, m_shouldInvertControl);
+        // Robot.m_drive.hybridDrive(speed, rotation, m_shouldInvertControl);
     }
 
     @Override
