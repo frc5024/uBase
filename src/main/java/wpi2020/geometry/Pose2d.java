@@ -215,4 +215,8 @@ public class Pose2d {
   public int hashCode() {
     return Objects.hash(m_translation, m_rotation);
   }
+
+  public String toString() {
+    return String.format("(%.2f, %.2f, %2f)", m_translation.getX(), m_translation.getY(), m_rotation.getDegrees());
+  }
 }

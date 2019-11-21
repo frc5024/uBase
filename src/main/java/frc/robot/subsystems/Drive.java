@@ -142,6 +142,8 @@ public class Drive extends Subsystem {
 
         m_currentPose = m_odometry.update(angle, wheelSpeeds);
 
+        // System.out.println(m_currentPose);
+
         // // Read encoder positions
         // double leftMeters =
         // m_leftEncoder.getMeters(Constants.DriveTrain.ticksPerRotation,

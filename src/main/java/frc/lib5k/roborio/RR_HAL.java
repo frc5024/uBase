@@ -89,7 +89,7 @@ public class RR_HAL {
                     output.write(language.getBytes(StandardCharsets.UTF_8));
 
                     // Write library version
-                    output.write(version.getBytes(StandardCharsets.UTF_8));
+                    output.write((" "+version).getBytes(StandardCharsets.UTF_8));
                 }
 
             } catch (IOException ex) {

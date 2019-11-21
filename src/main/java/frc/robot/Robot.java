@@ -10,6 +10,7 @@ import frc.lib5k.components.Compass;
 import frc.lib5k.components.USBVisionCamera;
 import frc.lib5k.components.Limelight.LEDMode;
 import frc.lib5k.kinematics.FieldPosition;
+import frc.lib5k.roborio.RR_HAL;
 import frc.lib5k.utils.RobotLogger;
 import frc.lib5k.utils.RobotLogger.Level;
 import frc.robot.autonomous.Chooser;
@@ -48,6 +49,9 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
+		// Because we can
+		RR_HAL.reportFRCVersion("Java", RR_HAL.getLibraryVersion());
+
 		logger.log("Robot initializing", Level.kRobot);
 		m_oi = new OI();
 

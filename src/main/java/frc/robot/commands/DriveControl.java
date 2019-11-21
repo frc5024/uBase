@@ -61,6 +61,9 @@ public class DriveControl extends Command {
         // Send movement speeds to DriveTrain
         Robot.m_drive.smoothDrive(speed, rotation, m_shouldInvertControl);
         // Robot.m_drive.hybridDrive(speed, rotation, m_shouldInvertControl);
+
+        speed = 0.0;
+        rotation = 0.0;
     }
 
     @Override
