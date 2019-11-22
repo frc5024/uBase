@@ -48,4 +48,8 @@ public class OI {
     return driverController.getAButtonPressed();
   }
 
+  public boolean getCameraToggle() {
+    return driverController.getBButtonPressed();
+  }
+
 }

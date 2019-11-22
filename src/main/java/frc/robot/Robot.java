@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.lib5k.components.AutoCamera;
 import frc.lib5k.components.Compass;
+import frc.lib5k.components.Limelight;
 import frc.lib5k.components.USBVisionCamera;
 import frc.lib5k.components.Limelight.LEDMode;
 import frc.lib5k.kinematics.FieldPosition;
@@ -31,6 +32,7 @@ public class Robot extends TimedRobot {
 	public static Drive m_drive = new Drive();
 	public static OI m_oi;
 	public static Gyroscope m_gyro = Gyroscope.getInstance();
+	public static Limelight m_limelight = new Limelight(false);
 
 	/* Commands */
 	DriveControl m_driveControl;
@@ -64,10 +66,10 @@ public class Robot extends TimedRobot {
 		m_drive.zeroEncoders();
 
 		// Connect camera
-		m_camera = new USBVisionCamera("Main camera", 0,8, Constants.pcm_led);
-		m_camera.keepCameraAwake(true);
+		// m_camera = new USBVisionCamera("Main camera", 0,8, Constants.pcm_led);
+		// m_camera.keepCameraAwake(true);
 
-		m_camera.setLED(USBVisionCamera.LEDMode.BLINK);
+		// m_camera.setLED(USBVisionCamera.LEDMode.BLINK);
 
 	}
 
