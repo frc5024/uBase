@@ -4,13 +4,11 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import frc.lib5k.components.AutoCamera;
-import frc.lib5k.components.Compass;
 import frc.lib5k.components.Limelight;
 import frc.lib5k.components.USBVisionCamera;
 import frc.lib5k.components.Limelight.LEDMode;
-import frc.lib5k.kinematics.FieldPosition;
+import frc.lib5k.roborio.FaultReporter;
 import frc.lib5k.utils.RobotLogger;
 import frc.lib5k.utils.RobotLogger.Level;
 import frc.robot.autonomous.Chooser;
@@ -27,6 +25,7 @@ import frc.robot.subsystems.Gyroscope;
  */
 public class Robot extends TimedRobot {
 	RobotLogger logger = RobotLogger.getInstance();
+	FaultReporter reporter = FaultReporter.getInstance();
 
 	/* Subsystems */
 	public static Drive m_drive = new Drive();
