@@ -106,6 +106,8 @@ public class Drive extends Subsystem {
         // Publish MovementPlanner PIDControllers
         m_movementPlanner.publishPIDControllers();
 
+        setRampRate(0.16);
+
     }
 
     @Override
@@ -247,7 +249,7 @@ public class Drive extends Subsystem {
 
         // Feed drive command
         // m_differentialDrive.curvatureDrive(speed, rotation, quickTurn);
-        m_differentialDrive.arcadeDrive(speed, rotation);
+        m_differentialDrive.arcadeDrive(speed, rotation, true);
 
     }
 
@@ -329,6 +331,11 @@ public class Drive extends Subsystem {
 
     public EncoderBase getRightEncoder() {
         return m_rightEncoder;
+    }
+
+    public void setRampRate(double rate) {
+        m_leftGearbox.getMaster().configOpenloopRamp(rate);
+        m_rightGearbox.getMaster().configOpenloopRamp(rate);
     }
 
     public void outputTelemetry() {

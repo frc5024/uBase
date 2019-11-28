@@ -1,12 +1,14 @@
 plugins {
     id "java"
     id "edu.wpi.first.GradleRIO" version "2019.4.1"
+    // id "com.snobot.simulator.plugin.SnobotSimulatorPlugin" version "2019-4.0.0" apply false
     // id "edu.wpi.first.GradleRIO" version "2020.1.1"
 }
 
 sourceCompatibility = JavaVersion.VERSION_11
 targetCompatibility = JavaVersion.VERSION_11
 
+sourceSets.main.java.srcDirs = ['src/main/java']
 def ROBOT_MAIN_CLASS = "frc.robot.Main"
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
@@ -37,6 +39,13 @@ deploy {
         }
     }
 }
+
+// SnobotSim
+// apply plugin: com.snobot.simulator.plugin.SnobotSimulatorPlugin
+
+// configurations {
+//     snobotSimCompile
+// }
 
 // Set this to true to enable desktop support.
 def includeDesktopSupport = true
@@ -75,6 +84,9 @@ dependencies {
     }
 
     // simulation wpi.deps.sim.gui(wpi.platforms.desktop, false)
+
+    // SnobotSim
+    // snobotSimCompile snobotSimJava()
     
 }
 

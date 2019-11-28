@@ -9,6 +9,7 @@ import frc.lib5k.components.Limelight;
 import frc.lib5k.components.USBVisionCamera;
 import frc.lib5k.components.Limelight.LEDMode;
 import frc.lib5k.roborio.FaultReporter;
+import frc.lib5k.simulation.Hooks;
 import frc.lib5k.utils.RobotLogger;
 import frc.lib5k.utils.RobotLogger.Level;
 import frc.robot.autonomous.Chooser;
@@ -70,6 +71,9 @@ public class Robot extends TimedRobot {
 
 		// m_camera.setLED(USBVisionCamera.LEDMode.BLINK);
 
+		// Run Teleop in simulation
+		Hooks.setStateIfSimulated(Hooks.RobotState.TELEOP);
+
 	}
 
 	/**
@@ -100,6 +104,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void disabledInit() {
+		logger.log("Robot", "Disabled", Level.kRobot);
 		m_drive.setBrakes(false);
 	}
 
@@ -122,6 +127,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousInit() {
+		logger.log("Robot", "Autonomous starting", Level.kRobot);
 		sharedInit();
 
 		// Set the autonomous gyro offset
@@ -152,6 +158,7 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopInit() {
+		logger.log("Robot", "Teleop starting", Level.kRobot);
 		sharedInit();
 
 		// Stop autonomous
