@@ -48,4 +48,16 @@ public class OI {
     return driverController.getAButtonPressed();
   }
 
+  public boolean getCameraToggle() {
+    return driverController.getBButtonPressed();
+  }
+
+  public boolean getDriveModeToggle() {
+    return driverController.getBumper(GenericHID.Hand.kLeft) && driverController.getYButtonPressed();
+  }
+
+  public boolean getDiagnostics(){
+    return driverController.getYButtonPressed();
+  }
+
 }

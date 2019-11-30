@@ -4,13 +4,11 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
-import frc.lib5k.components.AutoCamera;
-import frc.lib5k.components.Compass;
-import frc.lib5k.components.Limelight;
 import frc.lib5k.components.USBVisionCamera;
-import frc.lib5k.components.Limelight.LimelightTarget;
-import frc.lib5k.kinematics.FieldPosition;
+import frc.lib5k.components.limelight.Limelight;
+import frc.lib5k.components.limelight.Limelight.LEDMode;
+import frc.lib5k.roborio.FaultReporter;
+import frc.lib5k.simulation.Hooks;
 import frc.lib5k.utils.RobotLogger;
 import frc.lib5k.utils.RobotLogger.Level;
 import frc.robot.autonomous.Chooser;
@@ -27,11 +25,13 @@ import frc.robot.subsystems.Gyroscope;
  */
 public class Robot extends TimedRobot {
 	RobotLogger logger = RobotLogger.getInstance();
+	FaultReporter reporter = FaultReporter.getInstance();
 
 	/* Subsystems */
 	public static Drive m_drive = new Drive();
 	public static OI m_oi;
 	public static Gyroscope m_gyro = Gyroscope.getInstance();
+	public static Limelight m_limelight = new Limelight();
 
 	/* Commands */
 	DriveControl m_driveControl;
@@ -64,11 +64,17 @@ public class Robot extends TimedRobot {
 		Gyroscope.getInstance().setAutonOffset();
 		m_drive.zeroEncoders();
 
-		// Connect camera
-		m_camera = new USBVisionCamera("Main camera", 0,8, Constants.pcm_led);
-		m_camera.keepCameraAwake(true);
+		// Turn off Limelight LEDs
+		m_limelight.setLEDMode(LEDMode.OFF);
 
-		m_camera.setLED(USBVisionCamera.LEDMode.BLINK);
+		// Connect camera
+		// m_camera = new USBVisionCamera("Main camera", 0,8, Constants.pcm_led);
+		// m_camera.keepCameraAwake(true);
+
+		// m_camera.setLED(USBVisionCamera.LEDMode.BLINK);
+
+		// Run Teleop in simulation
+		Hooks.setStateIfSimulated(Hooks.RobotState.TELEOP);
 
 	}
 
@@ -100,6 +106,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void disabledInit() {
+		logger.log("Robot", "Disabled", Level.kRobot);
 		m_drive.setBrakes(false);
 	}
 
@@ -122,6 +129,7 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void autonomousInit() {
+		logger.log("Robot", "Autonomous starting", Level.kRobot);
 		sharedInit();
 
 		// Set the autonomous gyro offset
@@ -152,6 +160,7 @@ public class Robot extends TimedRobot {
 
 	@Override
 	public void teleopInit() {
+		logger.log("Robot", "Teleop starting", Level.kRobot);
 		sharedInit();
 
 		// Stop autonomous
