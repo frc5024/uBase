@@ -4,10 +4,9 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
-import frc.lib5k.components.AutoCamera;
-import frc.lib5k.components.Limelight;
 import frc.lib5k.components.USBVisionCamera;
-import frc.lib5k.components.Limelight.LEDMode;
+import frc.lib5k.components.limelight.Limelight;
+import frc.lib5k.components.limelight.Limelight.LEDMode;
 import frc.lib5k.roborio.FaultReporter;
 import frc.lib5k.simulation.Hooks;
 import frc.lib5k.utils.RobotLogger;
@@ -32,7 +31,7 @@ public class Robot extends TimedRobot {
 	public static Drive m_drive = new Drive();
 	public static OI m_oi;
 	public static Gyroscope m_gyro = Gyroscope.getInstance();
-	public static Limelight m_limelight = new Limelight(false);
+	public static Limelight m_limelight = new Limelight();
 
 	/* Commands */
 	DriveControl m_driveControl;
@@ -42,7 +41,7 @@ public class Robot extends TimedRobot {
 
 	CommandGroup m_autonomousCommand;
 
-	USBVisionCamera m_camera;
+    USBVisionCamera m_camera;
 
 	/**
 	 * This function is run when the robot is first started up and should be used
@@ -64,6 +63,9 @@ public class Robot extends TimedRobot {
 		Gyroscope.getInstance().getGyro().reset();
 		Gyroscope.getInstance().setAutonOffset();
 		m_drive.zeroEncoders();
+
+		// Turn off Limelight LEDs
+		m_limelight.setLEDMode(LEDMode.OFF);
 
 		// Connect camera
 		// m_camera = new USBVisionCamera("Main camera", 0,8, Constants.pcm_led);

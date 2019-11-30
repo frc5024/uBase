@@ -1,7 +1,8 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
-import frc.lib5k.components.Limelight.LEDMode;
+import frc.lib5k.components.limelight.Limelight.LEDMode;
+import frc.lib5k.components.limelight.Limelight.CameraMode;
 import frc.lib5k.control.CubicDeadband;
 import frc.lib5k.control.Toggle;
 import frc.lib5k.utils.RobotLogger;
@@ -75,8 +76,8 @@ public class DriveControl extends Command {
             logger.log("DriveControl", String.format("Mode: %s, quickTurn: %s%n", (driveMode) ? "semi-constant" : "rate", (quickTurn)?"enabled":"disabled"), Level.kWarning);
         }
 
-        Robot.m_limelight.setCamMode((enablevision) ? 0 : 1);
-        Robot.m_limelight.setLED((enablevision) ? LEDMode.ON : LEDMode.OFF);
+        Robot.m_limelight.setCameraMode((enablevision) ? CameraMode.VISION : CameraMode.DRIVER);
+        Robot.m_limelight.setLEDMode((enablevision) ? LEDMode.ON : LEDMode.OFF);
 
     }
 
