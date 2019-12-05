@@ -17,7 +17,6 @@ import frc.lib5k.kinematics.DriveSignal;
 import frc.lib5k.kinematics.FieldPosition;
 import frc.lib5k.kinematics.MovementPlanner;
 import frc.lib5k.kinematics.MovementSegment;
-import frc.lib5k.kinematics.DriveSignal.DriveType;
 import frc.lib5k.spatial.LocalizationEngine;
 import frc.lib5k.utils.RobotLogger;
 import frc.lib5k.utils.RobotLogger.Level;
@@ -124,6 +123,7 @@ public class Drive extends Subsystem {
             m_leftGearbox.rear.setNeutralMode(m_desiredBrakeMode);
             m_rightGearbox.front.setNeutralMode(m_desiredBrakeMode);
             m_rightGearbox.rear.setNeutralMode(m_desiredBrakeMode);
+
 
             // Data had been sent, disable lock
             m_isNewConfigData = false;
