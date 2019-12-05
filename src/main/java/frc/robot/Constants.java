@@ -6,6 +6,10 @@ import frc.lib5k.kinematics.motionprofiling.MotionConstraints;
 
 public class Constants {
 
+    public static class HumanInputs {
+        public static final double robotSteeringDampening = 0.2;
+    }
+
     /* DriveTrain */
     public static class DriveTrain {
         public static final int leftFrontMotor = 1;

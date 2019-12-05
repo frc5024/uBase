@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
 import frc.lib5k.components.limelight.Limelight.LEDMode;
+import frc.lib5k.components.drive.InputUtils;
 import frc.lib5k.components.limelight.Limelight.CameraMode;
 import frc.lib5k.control.CubicDeadband;
 import frc.lib5k.control.Toggle;
@@ -68,12 +69,15 @@ public class DriveControl extends Command {
         if (!driveMode) {
             Robot.m_drive.smoothDrive(speed, rotation, quickTurn, m_shouldInvertControl);
         } else {
-            Robot.m_drive.hybridDrive(speed, rotation, m_shouldInvertControl);
+            Robot.m_drive.hybridDrive(speed,
+                    InputUtils.dampenInputs(rotation, Constants.HumanInputs.robotSteeringDampening, 1, -1),
+                    m_shouldInvertControl);
         }
 
         // Handle diagnostic data
         if (Robot.m_oi.getDiagnostics()) {
-            logger.log("DriveControl", String.format("Mode: %s, quickTurn: %s%n", (driveMode) ? "semi-constant" : "rate", (quickTurn)?"enabled":"disabled"), Level.kWarning);
+            logger.log("DriveControl", String.format("Mode: %s, quickTurn: %s%n",
+                    (driveMode) ? "semi-constant" : "rate", (quickTurn) ? "enabled" : "disabled"), Level.kWarning);
         }
 
         Robot.m_limelight.setCameraMode((enablevision) ? CameraMode.VISION : CameraMode.DRIVER);

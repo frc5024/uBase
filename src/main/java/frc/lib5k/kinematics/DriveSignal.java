@@ -27,8 +27,8 @@ public class DriveSignal {
         this.type = type;
     }
 
-    public static DriveSignal fromArcadeInputs(double speed, double rotation, DriveType type) {
-        return new DriveSignal((rotation + speed), (speed - rotation), type);
+    public static DriveSignal fromArcadeInputs(double speed, double rotation) {
+        return new DriveSignal((rotation + speed), (speed - rotation), DriveType.STANDARD);
     }
 
     public double getR() {
