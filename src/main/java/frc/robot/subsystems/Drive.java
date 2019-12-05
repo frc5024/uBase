@@ -22,6 +22,7 @@ import frc.lib5k.utils.RobotLogger;
 import frc.lib5k.utils.RobotLogger.Level;
 import frc.robot.Constants;
 import frc.robot.commands.DriveControl;
+import frc.lib5k.components.drive.*;
 
 /**
  * Handles control of the drivebase, tracking the robot's position, and
@@ -164,7 +165,7 @@ public class Drive extends Subsystem {
         // System.out.println(segment);
 
         // Send segment data to motors
-        arcadeDrive(segment.getSpeed(), segment.getTurn());
+        drive(segment.getSpeed(), segment.getTurn());
 
         // Return weather or not the segment is finished (has the robot reached the end
         // point)
@@ -207,80 +208,39 @@ public class Drive extends Subsystem {
     // return false;
     // }
 
-    /**
-     * Drive the robot with some help from sensors
-     * 
-     * @param speed     Desired robot speed
-     * @param rotation  Desired robot turn rate
-     * @param quickTurn Should quickTurn be enabled?
-     */
-    public void smoothDrive(double speed, double rotation, boolean quickTurn, boolean invertControl) {
-
-        // Check if we should be correcting robot drift
-        // if (rotation == 0.0 && Math.abs(speed) > 0.05) {
-        // double current_angle = Gyroscope.getInstance().getGyro().getAngle();
-
-        // // Set drift correction and reset setpoint if this state is new
-        // if (!m_driftCorrectionActive) {
-
-        // m_driveCorrector.reset();
-        // m_driveCorrector.setSetpoint(current_angle);
-
-        // // Set state
-        // m_driftCorrectionActive = true;
-        // }
-
-        // // Determine rotation correction
-        // rotation = m_driveCorrector.feed(current_angle);
-        // } else {
-        // // Disable drift correction
-        // m_driftCorrectionActive = false;
-        // }
-
-        // Handle inverse control
-        speed = (invertControl) ? speed * -1 : speed;
-
-        // Slew robot speed
-        speed = m_speedSlew.feed(speed);
-
-        // Set moving and turning trackers
-        m_isMoving = (speed != 0.0);
-        m_isTurning = (rotation != 0.0);
-
-        // Feed drive command
-        // m_differentialDrive.curvatureDrive(speed, rotation, quickTurn);
-        m_differentialDrive.arcadeDrive(speed, rotation, true);
-
+    public enum DriveMode{
+        RATE, CURVATURE;
     }
-
-    public void hybridDrive(double speed, double turn, boolean invertControl) {
-        // Determine DriveSignal
-        DriveSignal signal = m_raiderDrive.computeSemiConst(speed * ((invertControl) ? -1 : 1), turn, true);
-
-        rawDrive(signal);
-
-
-        // // Define a signal
-        // DriveSignal signal = new DriveSignal(0, 0);
-
-        // // Determine appropriate movement calculation for robot
-        // // If robot speed passes the threshold, we should switch to arcs
-        // if (Math.abs(speed) > .5) {
-        //     m_differentialDrive.curvatureDrive(speed * ((invertControl) ? -1 : 1), turn, false);
-        // } else {
-        //     smoothDrive(speed, turn, false, invertControl);
-        // }
-
-        // Execute the signal
-        // rawDrive(signal);
-
+    
+    // Simple rate-of-change drive method
+    public void drive(double speed, double turn){
+        drive(speed, turn, false);
     }
-
-    public void arcadeDrive(double speed, double rotation) {
-        // System.out.println("" + speed + ", " + rotation);
-        m_differentialDrive.arcadeDrive(speed, rotation);
+    
+    // Simple rate-of-change drive method with ability to invert controls
+    public void drive(double speed, double turn, boolean invert){
+        drive(speed, turn, invert, DriveMode.RATE);
     }
-    // double rightSquaredAccel = (rightMPS - lastRightMPS)
+    
+    // Drive method with control inversion selection, and mode selection
+    public void drive(double speed, double turn, boolean invert, DriveMode mode){
+    
+        // Invert speed control
+        speed *= (invert) ? -1 : 1;
+    
+        // Control robot based on mode
+        switch(mode){
+            case RATE:
+                m_differentialDrive.arcadeDrive(speed, turn, false);
+                break;
+    
+            case CURVATURE:
+                DriveSignal signal = DriveCalculator.semiConstCurve(speed, turn);
+                rawDrive(signal);
+                break;
+    
+        }
+    }
 
     /**
      * Enables or disables brake mode on all drivebase talons.
