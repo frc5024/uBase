@@ -105,7 +105,7 @@ public class Drive extends Subsystem {
         // Publish MovementPlanner PIDControllers
         m_movementPlanner.publishPIDControllers();
 
-        setRampRate(0.16);
+        setRampRate(0.12);
 
     }
 
