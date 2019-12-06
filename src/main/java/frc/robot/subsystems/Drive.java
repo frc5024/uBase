@@ -96,8 +96,8 @@ public class Drive extends Subsystem {
         m_speedSlew = new SlewLimiter(Constants.accelerationStep);
 
         // Configure encoders
-        m_leftEncoder = m_leftGearbox.getEncoder();
-        m_rightEncoder = m_rightGearbox.getEncoder();
+        m_leftEncoder = m_leftGearbox.getEncoder(0);
+        m_rightEncoder = m_rightGearbox.getEncoder(0);
 
         // Configure Autonomous controllers
         m_movementPlanner = new MovementPlanner(Constants.DriveTrain.forwardPIDGains,
