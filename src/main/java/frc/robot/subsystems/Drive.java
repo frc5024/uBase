@@ -342,6 +342,9 @@ public class Drive extends Subsystem {
         SmartDashboard.putNumber("[DriveTrain] Left gearbox sensor", getLeftEncoder().getRawTicks());
         SmartDashboard.putNumber("[DriveTrain] Right gearbox sensor", getRightEncoder().getRawTicks());
 
+        m_leftGearbox.updateTelemetry();
+        m_rightGearbox.updateTelemetry();
+
     }
 
     @Override

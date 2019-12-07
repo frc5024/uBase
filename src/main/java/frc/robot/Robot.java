@@ -92,6 +92,8 @@ public class Robot extends TimedRobot {
 		if (isSimulation()) {
 			m_drive.hybridDrive(.5, .2, false);
 		}
+
+		m_drive.outputTelemetry();
 	}
 
 	private void sharedInit() {
