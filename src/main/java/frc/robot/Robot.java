@@ -92,6 +92,7 @@ public class Robot extends TimedRobot {
 		if (isSimulation()) {
 			m_drive.hybridDrive(.5, .2, false);
 		}
+
 	}
 
 	private void sharedInit() {
