@@ -6,10 +6,10 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.lib5k.components.EncoderBase;
-import frc.lib5k.components.GearBox;
 import frc.lib5k.components.GearBoxEncoder;
 import frc.lib5k.components.RaiderDrive;
+import frc.lib5k.components.motors.TalonSRXCollection;
+import frc.lib5k.components.sensors.EncoderBase;
 import frc.lib5k.control.CubicDeadband;
 import frc.lib5k.control.SlewLimiter;
 import frc.lib5k.kinematics.DriveConstraints;
@@ -35,8 +35,8 @@ public class Drive extends Subsystem {
 
     RobotLogger logger = RobotLogger.getInstance();
 
-    GearBox m_leftGearbox;
-    GearBox m_rightGearbox;
+    TalonSRXCollection m_leftGearbox;
+    TalonSRXCollection m_rightGearbox;
 
     DifferentialDrive m_differentialDrive;
     SlewLimiter m_speedSlew;
@@ -61,31 +61,33 @@ public class Drive extends Subsystem {
 
     // Drive speeds
 
-
     public Drive() {
         logger.log("Building drive", Level.kRobot);
 
         // Build drive gearboxes
-        m_leftGearbox = new GearBox(new WPI_TalonSRX(Constants.DriveTrain.leftFrontMotor),
-                new WPI_TalonSRX(Constants.DriveTrain.leftRearMotor), true);
-        m_rightGearbox = new GearBox(new WPI_TalonSRX(Constants.DriveTrain.rightFrontMotor),
-                new WPI_TalonSRX(Constants.DriveTrain.rightRearMotor), true);
+        logger.log("DriveTrain", "Linking motors", Level.kRobot);
+        m_leftGearbox = new TalonSRXCollection(new WPI_TalonSRX(Constants.DriveTrain.leftFrontMotor),
+                new WPI_TalonSRX(Constants.DriveTrain.leftRearMotor));
+        m_rightGearbox = new TalonSRXCollection(new WPI_TalonSRX(Constants.DriveTrain.rightFrontMotor),
+                new WPI_TalonSRX(Constants.DriveTrain.rightRearMotor));
 
         // Config current limits
-        m_leftGearbox.limitCurrent(Constants.DriveTrain.peakCurrent, Constants.DriveTrain.holdCurrent,
-                Constants.DriveTrain.currentTimeout);
-        m_rightGearbox.limitCurrent(Constants.DriveTrain.peakCurrent, Constants.DriveTrain.holdCurrent,
-                Constants.DriveTrain.currentTimeout);
+        logger.log("DriveTrain", "Configuring current limiting for gearboxes");
+        m_leftGearbox.setCurrentLimit(Constants.DriveTrain.peakCurrent, Constants.DriveTrain.currentTimeout,
+                Constants.DriveTrain.holdCurrent, 0);
+        m_rightGearbox.setCurrentLimit(Constants.DriveTrain.peakCurrent, Constants.DriveTrain.currentTimeout,
+                Constants.DriveTrain.holdCurrent, 0);
 
         // Build drivebase
-        m_differentialDrive = new DifferentialDrive(m_leftGearbox.getMaster(), m_rightGearbox.getMaster());
+        logger.log("DriveTrain", "Building differential drivebase controller", Level.kRobot);
+        m_differentialDrive = new DifferentialDrive(m_leftGearbox, m_rightGearbox);
         m_differentialDrive.setSafetyEnabled(false);
-        m_leftGearbox.getMaster().setSafetyEnabled(false);
-        m_rightGearbox.getMaster().setSafetyEnabled(false);
+        m_leftGearbox.setMasterMotorSafety(false);
+        m_rightGearbox.setMasterMotorSafety(false);
 
         // Set up RaiderDrive
-        m_raiderDrive = new RaiderDrive(new CubicDeadband(0.0, Constants.Deadbands.speed_percision), new CubicDeadband(Constants.Deadbands.rotation_deadband,
-                        Constants.Deadbands.roataion_percision));
+        m_raiderDrive = new RaiderDrive(new CubicDeadband(0.0, Constants.Deadbands.speed_percision),
+                new CubicDeadband(Constants.Deadbands.rotation_deadband, Constants.Deadbands.roataion_percision));
         m_raiderDrive.setRampRate(Constants.accelerationStep);
 
         m_differentialDrive.setDeadband(0.02);
@@ -94,8 +96,8 @@ public class Drive extends Subsystem {
         m_speedSlew = new SlewLimiter(Constants.accelerationStep);
 
         // Configure encoders
-        m_leftEncoder = new GearBoxEncoder(m_leftGearbox);
-        m_rightEncoder = new GearBoxEncoder(m_rightGearbox);
+        m_leftEncoder = m_leftGearbox.getEncoder(0);
+        m_rightEncoder = m_rightGearbox.getEncoder(0);
 
         // Configure Autonomous controllers
         m_movementPlanner = new MovementPlanner(Constants.DriveTrain.forwardPIDGains,
@@ -119,11 +121,8 @@ public class Drive extends Subsystem {
         if (m_isNewConfigData) {
 
             // Set brake mode for all talons
-            m_leftGearbox.front.setNeutralMode(m_desiredBrakeMode);
-            m_leftGearbox.rear.setNeutralMode(m_desiredBrakeMode);
-            m_rightGearbox.front.setNeutralMode(m_desiredBrakeMode);
-            m_rightGearbox.rear.setNeutralMode(m_desiredBrakeMode);
-
+            m_leftGearbox.getMaster().setNeutralMode(m_desiredBrakeMode);
+            m_rightGearbox.getMaster().setNeutralMode(m_desiredBrakeMode);
 
             // Data had been sent, disable lock
             m_isNewConfigData = false;
@@ -259,16 +258,16 @@ public class Drive extends Subsystem {
 
         rawDrive(signal);
 
-
         // // Define a signal
         // DriveSignal signal = new DriveSignal(0, 0);
 
         // // Determine appropriate movement calculation for robot
         // // If robot speed passes the threshold, we should switch to arcs
         // if (Math.abs(speed) > .5) {
-        //     m_differentialDrive.curvatureDrive(speed * ((invertControl) ? -1 : 1), turn, false);
+        // m_differentialDrive.curvatureDrive(speed * ((invertControl) ? -1 : 1), turn,
+        // false);
         // } else {
-        //     smoothDrive(speed, turn, false, invertControl);
+        // smoothDrive(speed, turn, false, invertControl);
         // }
 
         // Execute the signal
