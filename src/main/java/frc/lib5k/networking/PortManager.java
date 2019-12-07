@@ -20,6 +20,9 @@ public class PortManager {
     // By default, use the FRC 2014 rules, but allow this to be changed
     private IFirewall m_firewall = new FMS2014Firewall();
 
+    private PortManager() {
+    }
+
     public static PortManager getInstance() {
         if (m_instance == null) {
             m_instance = new PortManager();

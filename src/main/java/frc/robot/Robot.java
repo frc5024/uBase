@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import frc.lib5k.components.USBVisionCamera;
 import frc.lib5k.components.limelight.Limelight;
 import frc.lib5k.components.limelight.Limelight.LEDMode;
+import frc.lib5k.networking.PortManager;
 import frc.lib5k.roborio.FaultReporter;
 import frc.lib5k.simulation.Hooks;
 import frc.lib5k.utils.RobotLogger;
@@ -75,6 +76,9 @@ public class Robot extends TimedRobot {
 
 		// Run Teleop in simulation
 		Hooks.setStateIfSimulated(Hooks.RobotState.TELEOP);
+
+		// Allocate FRC Ports
+		PortManager.getInstance().allocateFRCPorts();
 
 	}
 
