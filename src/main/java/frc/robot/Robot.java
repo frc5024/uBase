@@ -9,6 +9,7 @@ import frc.lib5k.components.limelight.Limelight;
 import frc.lib5k.components.limelight.Limelight.LEDMode;
 import frc.lib5k.roborio.FaultReporter;
 import frc.lib5k.simulation.Hooks;
+import frc.lib5k.testing.ShuffleboardTester;
 import frc.lib5k.utils.RobotLogger;
 import frc.lib5k.utils.RobotLogger.Level;
 import frc.lib5k.wpilib.IExtendedRobotFramework;
@@ -42,7 +43,10 @@ public class Robot extends TimedRobot implements IExtendedRobotFramework{
 
 	CommandGroup m_autonomousCommand;
 
-    USBVisionCamera m_camera;
+	USBVisionCamera m_camera;
+	
+	/* Robot tests */
+	ShuffleboardTester testsController = ShuffleboardTester.getInstance();
 
 	/**
 	 * This function is run when the robot is first started up and should be used
@@ -76,6 +80,9 @@ public class Robot extends TimedRobot implements IExtendedRobotFramework{
 
 		// Run Teleop in simulation
 		Hooks.setStateIfSimulated(Hooks.RobotState.TELEOP);
+
+		// Publish shuffleboard tester
+		testsController.publish();
 
 	}
 
@@ -114,6 +121,9 @@ public class Robot extends TimedRobot implements IExtendedRobotFramework{
 	public void disabledInit() {
 		logger.log("Robot", "Disabled", Level.kRobot);
 		m_drive.setBrakes(false);
+
+		// Disable tests
+		testsController.disable();
 	}
 
 	@Override
@@ -191,7 +201,8 @@ public class Robot extends TimedRobot implements IExtendedRobotFramework{
 
 	@Override
 	public void testInit() {
-
+		// Enable tests
+		testsController.enable();
 	}
 
 	/**
@@ -199,5 +210,8 @@ public class Robot extends TimedRobot implements IExtendedRobotFramework{
 	 */
 	@Override
 	public void testPeriodic() {
+
+		// Update tests
+		// testsController.
 	}
 }
