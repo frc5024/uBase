@@ -11,6 +11,7 @@ import frc.lib5k.roborio.FaultReporter;
 import frc.lib5k.simulation.Hooks;
 import frc.lib5k.utils.RobotLogger;
 import frc.lib5k.utils.RobotLogger.Level;
+import frc.lib5k.wpilib.IExtendedRobotFramework;
 import frc.robot.autonomous.Chooser;
 import frc.robot.commands.DriveControl;
 import frc.robot.subsystems.Drive;
@@ -23,7 +24,7 @@ import frc.robot.subsystems.Gyroscope;
  * creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends TimedRobot implements IExtendedRobotFramework{
 	RobotLogger logger = RobotLogger.getInstance();
 	FaultReporter reporter = FaultReporter.getInstance();
 
@@ -95,7 +96,8 @@ public class Robot extends TimedRobot {
 
 	}
 
-	private void sharedInit() {
+	@Override
+	public void sharedInit() {
 		// Reduce network stress by disabling default telem. If LiveWindow is needed,
 		// reboot bot, then start Test Mode
 		LiveWindow.disableAllTelemetry();
