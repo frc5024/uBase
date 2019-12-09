@@ -140,6 +140,8 @@ public class Drive extends Subsystem {
         // Output telemetry data
         outputTelemetry();
 
+        // System.out.println(String.format("L: %.2f | R: %.2f", m_leftGearbox.getEstimatedVoltage(), m_rightGearbox.getEstimatedVoltage()));
+
     }
 
     /**
