@@ -5,6 +5,9 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib5k.components.RaiderDrive;
 import frc.lib5k.components.motors.TalonSRXCollection;
@@ -20,6 +23,7 @@ import frc.lib5k.spatial.LocalizationEngine;
 import frc.lib5k.utils.RobotLogger;
 import frc.lib5k.utils.RobotLogger.Level;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.commands.DriveControl;
 
 /**
@@ -58,7 +62,9 @@ public class Drive extends Subsystem {
     EncoderBase m_leftEncoder;
     EncoderBase m_rightEncoder;
 
-    // Drive speeds
+    /* Localizaiton */
+    DifferentialDriveOdometry m_odometry;
+    Pose2d m_currentPose = new Pose2d();
 
     public Drive() {
         logger.log("Building drive", Level.kRobot);
@@ -108,6 +114,10 @@ public class Drive extends Subsystem {
 
         setRampRate(0.12);
 
+        // COnfig odometry
+        m_odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(-Robot.m_gyro.getGyro().getAngle()),
+                new Pose2d(0.0, 0.0, new Rotation2d()));
+
     }
 
     @Override
@@ -131,11 +141,12 @@ public class Drive extends Subsystem {
         double leftMeters = m_leftEncoder.getMeters(Constants.DriveTrain.ticksPerRotation, Constants.Robot.wheelCirc);
         double rightMeters = m_rightEncoder.getMeters(Constants.DriveTrain.ticksPerRotation, Constants.Robot.wheelCirc);
 
-        // Read robot heading
-        double heading = Gyroscope.getInstance().getGyro().getAngle();
+        // // Read robot heading
+        Rotation2d heading = Rotation2d.fromDegrees(-Gyroscope.getInstance().getGyro().getAngle());
 
-        // Update the LocalizationEngine
-        m_localizationEngine.calculate(leftMeters, rightMeters, heading);
+        // // Update the LocalizationEngine
+        // m_localizationEngine.calculate(leftMeters, rightMeters, heading);
+        m_currentPose = m_odometry.update(heading, leftMeters, rightMeters);
 
         // Output telemetry data
         outputTelemetry();
