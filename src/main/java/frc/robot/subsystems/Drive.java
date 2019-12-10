@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.lib5k.components.RaiderDrive;
+import frc.lib5k.components.gyroscopes.NavX;
 import frc.lib5k.components.motors.TalonSRXCollection;
 import frc.lib5k.components.sensors.EncoderBase;
 import frc.lib5k.control.CubicDeadband;
@@ -132,7 +133,7 @@ public class Drive extends Subsystem {
         double rightMeters = m_rightEncoder.getMeters(Constants.DriveTrain.ticksPerRotation, Constants.Robot.wheelCirc);
 
         // Read robot heading
-        double heading = Gyroscope.getInstance().getGyro().getAngle();
+        double heading = NavX.getInstance().getAngle();
 
         // Update the LocalizationEngine
         m_localizationEngine.calculate(leftMeters, rightMeters, heading);
