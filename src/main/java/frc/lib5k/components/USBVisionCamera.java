@@ -1,7 +1,7 @@
 package frc.lib5k.components;
 
 import edu.wpi.first.wpilibj.Notifier;
-import edu.wpi.first.wpilibj.Solenoid;
+import frc.lib5k.components.pneumatics.BufferedSolenoid;
 import frc.lib5k.roborio.FPGAClock;
 
 public class USBVisionCamera extends AutoCamera {
@@ -10,7 +10,7 @@ public class USBVisionCamera extends AutoCamera {
         ON, OFF, BLINK;
     }
 
-    private Solenoid m_relay;
+    private BufferedSolenoid m_relay;
     private LEDMode m_desiredMode;
     private Notifier m_thread;
     private final double blink_ms = 25;
@@ -23,7 +23,7 @@ public class USBVisionCamera extends AutoCamera {
         super(name, usb_slot);
 
         // Init the relay
-        m_relay = new Solenoid(pcm_id, pcm_port);
+        m_relay = new BufferedSolenoid(pcm_id, pcm_port);
 
         // Set the desired mode
         m_desiredMode = LEDMode.OFF;
