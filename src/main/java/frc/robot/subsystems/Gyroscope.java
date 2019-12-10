@@ -22,6 +22,7 @@ public class Gyroscope extends Subsystem{
         logger.log("[Gyroscope] Attaching to MXP gyro", Level.kRobot);
         m_gyro = new AHRS(Port.kMXP);
 
+
         Shuffleboard.getTab("DriverStation").add(m_gyro);
 
     }
