@@ -1,12 +1,12 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import frc.lib5k.components.USBVisionCamera;
 import frc.lib5k.components.limelight.Limelight;
 import frc.lib5k.components.limelight.Limelight.LEDMode;
+import frc.lib5k.framework.TimedRobotEXT;
 import frc.lib5k.roborio.FaultReporter;
 import frc.lib5k.simulation.Hooks;
 import frc.lib5k.utils.RobotLogger;
@@ -23,7 +23,7 @@ import frc.robot.subsystems.Gyroscope;
  * creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends TimedRobotEXT {
 	RobotLogger logger = RobotLogger.getInstance();
 	FaultReporter reporter = FaultReporter.getInstance();
 
@@ -41,7 +41,7 @@ public class Robot extends TimedRobot {
 
 	CommandGroup m_autonomousCommand;
 
-    USBVisionCamera m_camera;
+	USBVisionCamera m_camera;
 
 	/**
 	 * This function is run when the robot is first started up and should be used
@@ -93,11 +93,10 @@ public class Robot extends TimedRobot {
 			m_drive.hybridDrive(.5, .2, false);
 		}
 
-		
-
 	}
 
-	private void sharedInit() {
+	@Override
+	public void sharedInit() {
 		// Reduce network stress by disabling default telem. If LiveWindow is needed,
 		// reboot bot, then start Test Mode
 		LiveWindow.disableAllTelemetry();
