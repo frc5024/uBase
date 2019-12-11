@@ -1,6 +1,7 @@
 package frc.robot.autonomous.actions;
 
 import edu.wpi.first.wpilibj.command.Command;
+import frc.lib5k.components.gyroscopes.NavX;
 import frc.lib5k.kinematics.motionprofiling.MotionProfile;
 import frc.lib5k.kinematics.motionprofiling.Motionprofiler;
 import frc.lib5k.kinematics.motionprofiling.Motionprofiler.MotionOutput;
@@ -24,7 +25,7 @@ public class FollowProfile extends Command {
         // Create the MotionProfiler
         m_profiler = new Motionprofiler(m_profile, Constants.DriveTrain.motionProfilePID,
                 Robot.m_drive.getLeftEncoder(), Robot.m_drive.getRightEncoder(), Constants.DriveTrain.ticksPerRotation,
-                Constants.Robot.wheelDiameter, Constants.Robot.wheelbaseWidth, Robot.m_gyro.getGyro()::getAngle);
+                Constants.Robot.wheelDiameter, Constants.Robot.wheelbaseWidth, NavX.getInstance()::getAngle);
 
         requires(Robot.m_drive);
     }
