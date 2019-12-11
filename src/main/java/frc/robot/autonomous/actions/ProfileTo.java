@@ -1,6 +1,7 @@
 package frc.robot.autonomous.actions;
 
 import edu.wpi.first.wpilibj.command.Command;
+import frc.lib5k.components.gyroscopes.NavX;
 import frc.lib5k.kinematics.Error2D;
 import frc.lib5k.kinematics.FieldPosition;
 import frc.lib5k.kinematics.motionprofiling.MotionConstraints;
@@ -40,7 +41,7 @@ public class ProfileTo extends Command {
         // Configure the profiler
         profiler = new Motionprofiler(profile.generate(0.02), Constants.DriveTrain.motionProfilePID,
                 Robot.m_drive.getLeftEncoder(), Robot.m_drive.getRightEncoder(), Constants.DriveTrain.ticksPerRotation,
-                Constants.Robot.wheelDiameter, Constants.Robot.wheelbaseWidth, Robot.m_gyro.getGyro()::getAngle);
+                Constants.Robot.wheelDiameter, Constants.Robot.wheelbaseWidth, NavX.getInstance()::getAngle);
 
         requires(Robot.m_drive);
 

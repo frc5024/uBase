@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import frc.lib5k.components.USBVisionCamera;
+import frc.lib5k.components.gyroscopes.NavX;
 import frc.lib5k.components.limelight.Limelight;
 import frc.lib5k.components.limelight.Limelight.LEDMode;
 import frc.lib5k.roborio.FaultReporter;
@@ -14,7 +15,6 @@ import frc.lib5k.utils.RobotLogger.Level;
 import frc.robot.autonomous.Chooser;
 import frc.robot.commands.DriveControl;
 import frc.robot.subsystems.Drive;
-import frc.robot.subsystems.Gyroscope;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -30,7 +30,6 @@ public class Robot extends TimedRobot {
 	/* Subsystems */
 	public static Drive m_drive = new Drive();
 	public static OI m_oi;
-	public static Gyroscope m_gyro = Gyroscope.getInstance();
 	public static Limelight m_limelight = new Limelight();
 
 	/* Commands */
@@ -60,8 +59,7 @@ public class Robot extends TimedRobot {
 		logger.start(0.02);
 
 		// Init sensors
-		Gyroscope.getInstance().getGyro().reset();
-		Gyroscope.getInstance().setAutonOffset();
+		NavX.getInstance().reset();
 		m_drive.zeroEncoders();
 
 		// Turn off Limelight LEDs
@@ -92,6 +90,9 @@ public class Robot extends TimedRobot {
 		if (isSimulation()) {
 			m_drive.hybridDrive(.5, .2, false);
 		}
+
+		
+
 	}
 
 	private void sharedInit() {
@@ -136,8 +137,7 @@ public class Robot extends TimedRobot {
 		sharedInit();
 
 		// Set the autonomous gyro offset
-		Gyroscope.getInstance().getGyro().reset();
-		Gyroscope.getInstance().setAutonOffset();
+		NavX.getInstance().reset();
 		m_drive.zeroEncoders();
 		m_drive.stop();
 
