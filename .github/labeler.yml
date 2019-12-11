@@ -1,0 +1,2 @@
+# Add "lib5k" as label any PR that touches Lib5K files
+lib5k: src/main/java/frc/lib5k
