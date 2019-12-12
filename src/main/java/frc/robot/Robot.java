@@ -1,7 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import frc.lib5k.components.USBVisionCamera;
@@ -12,7 +11,6 @@ import frc.lib5k.roborio.FaultReporter;
 import frc.lib5k.simulation.Hooks;
 import frc.lib5k.utils.RobotLogger;
 import frc.lib5k.utils.RobotLogger.Level;
-import frc.robot.autonomous.Chooser;
 import frc.robot.commands.DriveControl;
 import frc.robot.subsystems.Drive;
 
@@ -35,12 +33,7 @@ public class Robot extends TimedRobot {
 	/* Commands */
 	DriveControl m_driveControl;
 
-	/* Auton */
-	Chooser m_chooser;
-
-	CommandGroup m_autonomousCommand;
-
-    USBVisionCamera m_camera;
+	USBVisionCamera m_camera;
 
 	/**
 	 * This function is run when the robot is first started up and should be used
@@ -53,8 +46,6 @@ public class Robot extends TimedRobot {
 
 		logger.log("Building commands", Level.kRobot);
 		m_driveControl = new DriveControl();
-
-		m_chooser = new Chooser();
 
 		logger.start(0.02);
 
@@ -90,8 +81,6 @@ public class Robot extends TimedRobot {
 		if (isSimulation()) {
 			m_drive.hybridDrive(.5, .2, false);
 		}
-
-		
 
 	}
 
@@ -141,15 +130,6 @@ public class Robot extends TimedRobot {
 		m_drive.zeroEncoders();
 		m_drive.stop();
 
-		// Read selected autonomous mode
-		m_autonomousCommand = m_chooser.getAutonomousCommand();
-		// m_autonomousCommand.start();
-
-		// Try to start the command
-		if (m_autonomousCommand != null) {
-			m_autonomousCommand.start();
-		}
-
 	}
 
 	/**
@@ -165,11 +145,6 @@ public class Robot extends TimedRobot {
 	public void teleopInit() {
 		logger.log("Robot", "Teleop starting", Level.kRobot);
 		sharedInit();
-
-		// Stop autonomous
-		if (m_autonomousCommand != null) {
-			m_autonomousCommand.cancel();
-		}
 
 		/* Start commands */
 		if (m_driveControl != null) {

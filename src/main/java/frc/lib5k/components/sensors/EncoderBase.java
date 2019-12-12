@@ -3,6 +3,7 @@ package frc.lib5k.components.sensors;
 import java.util.ArrayList;
 
 import frc.lib5k.interfaces.PeriodicComponent;
+import frc.lib5k.roborio.FPGAClock;
 
 /**
  * Base for encoders
@@ -13,6 +14,7 @@ public abstract class EncoderBase implements PeriodicComponent {
     private int previous_ticks;
     private ArrayList<Integer> pastSpeeds = new ArrayList<Integer>();
     private final int MAX_READINGS = 5;
+    private double lastTime, dt;
 
     /**
      * Get the raw sensor reading from encoder
@@ -80,7 +82,12 @@ public abstract class EncoderBase implements PeriodicComponent {
         return speed;
     }
 
+    // public int getRPM(int tpr) {
+    //     return ((getSpeed() / tpr) / dt)
+    // }
+
     public double getAverageSpeed() {
+
         double output = 0.0;
 
         for (Integer speed : pastSpeeds) {
@@ -92,6 +99,11 @@ public abstract class EncoderBase implements PeriodicComponent {
 
     @Override
     public void update() {
+        // Determine the current time
+        double time = FPGAClock.getFPGAMilliseconds();
+        dt = time - lastTime;
+        lastTime = time;
+
         // Determine current speed
         int current_ticks = getTicks();
         speed = current_ticks - previous_ticks;

@@ -218,6 +218,10 @@ public class TalonSRXCollection extends SpeedControllerGroup implements IMotorCo
 
     }
 
+    public WPI_TalonSRX getSlave(int id) {
+        return slaves[id];
+    }
+
     /**
      * For-Each over each slave controller
      * 

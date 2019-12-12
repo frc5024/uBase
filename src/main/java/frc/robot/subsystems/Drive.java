@@ -172,41 +172,6 @@ public class Drive extends Subsystem {
         return segment.isFinished();
     }
 
-    /**
-     * Turn to an angle
-     * 
-     * @param angle       Desired angle
-     * @param constraints Drivetrain constraints
-     * @param epsilon     Error for angle
-     * 
-     * @return Has the action finished?
-     */
-    // TODO: This can probably be implemented by calling driveTo with an end point
-    // equal to the current, but a new theta
-    // public boolean turnTo(double angle, DriveConstraints constraints, double
-    // epsilon) {
-    // // Get turn output
-    // double rotation =
-    // -m_turnController.feed(Gyroscope.getInstance().getGyro().getAngle());
-
-    // // Bind output
-    // rotation = Math.max(rotation, -constraints.getMaxTurn());
-    // rotation = Math.min(rotation, constraints.getMaxTurn());
-
-    // // Determine if the action has finished
-    // if (m_turnController.isFinished(epsilon)) {
-    // // PID finished
-    // stop();
-    // return true;
-    // }
-
-    // // Send drive signal
-    // DriveSignal signal = DriveSignal.fromArcadeInputs(0.0, rotation,
-    // DriveType.STANDARD);
-    // rawDrive(signal);
-
-    // return false;
-    // }
 
     /**
      * Drive the robot with some help from sensors
@@ -217,26 +182,6 @@ public class Drive extends Subsystem {
      */
     public void smoothDrive(double speed, double rotation, boolean quickTurn, boolean invertControl) {
 
-        // Check if we should be correcting robot drift
-        // if (rotation == 0.0 && Math.abs(speed) > 0.05) {
-        // double current_angle = Gyroscope.getInstance().getGyro().getAngle();
-
-        // // Set drift correction and reset setpoint if this state is new
-        // if (!m_driftCorrectionActive) {
-
-        // m_driveCorrector.reset();
-        // m_driveCorrector.setSetpoint(current_angle);
-
-        // // Set state
-        // m_driftCorrectionActive = true;
-        // }
-
-        // // Determine rotation correction
-        // rotation = m_driveCorrector.feed(current_angle);
-        // } else {
-        // // Disable drift correction
-        // m_driftCorrectionActive = false;
-        // }
 
         // Handle inverse control
         speed = (invertControl) ? speed * -1 : speed;
@@ -259,21 +204,6 @@ public class Drive extends Subsystem {
         DriveSignal signal = m_raiderDrive.computeSemiConst(speed * ((invertControl) ? -1 : 1), turn, true);
 
         rawDrive(signal);
-
-        // // Define a signal
-        // DriveSignal signal = new DriveSignal(0, 0);
-
-        // // Determine appropriate movement calculation for robot
-        // // If robot speed passes the threshold, we should switch to arcs
-        // if (Math.abs(speed) > .5) {
-        // m_differentialDrive.curvatureDrive(speed * ((invertControl) ? -1 : 1), turn,
-        // false);
-        // } else {
-        // smoothDrive(speed, turn, false, invertControl);
-        // }
-
-        // Execute the signal
-        // rawDrive(signal);
 
     }
 
@@ -303,9 +233,6 @@ public class Drive extends Subsystem {
         return m_desiredBrakeMode == NeutralMode.Brake;
     }
 
-    // public void setMode(ControlType type) {
-    // m_currentControlType = type;
-    // }
 
     /**
      * Directly drive the gearboxes. This should only be used wile motion profiling
