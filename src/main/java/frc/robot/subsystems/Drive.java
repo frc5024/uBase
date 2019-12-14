@@ -29,6 +29,7 @@ import frc.robot.commands.DriveControl;
  */
 public class Drive extends Subsystem {
 
+    private static Drive m_instance = null;
     // public enum ControlType {
     // DEFAULT, ASSIST, AUTONOMOUS, PATH
     // }
@@ -61,7 +62,7 @@ public class Drive extends Subsystem {
 
     // Drive speeds
 
-    public Drive() {
+    private Drive() {
         logger.log("Building drive", Level.kRobot);
 
         // Build drive gearboxes
@@ -111,6 +112,14 @@ public class Drive extends Subsystem {
 
     }
 
+    public static Drive getInstance() {
+        if (m_instance == null) {
+            m_instance = new Drive();
+        }
+
+        return m_instance;
+    }
+
     @Override
     public void periodic() {
         // Update encoders
@@ -141,7 +150,8 @@ public class Drive extends Subsystem {
         // Output telemetry data
         outputTelemetry();
 
-        // System.out.println(String.format("L: %.2f | R: %.2f", m_leftGearbox.getEstimatedVoltage(), m_rightGearbox.getEstimatedVoltage()));
+        // System.out.println(String.format("L: %.2f | R: %.2f",
+        // m_leftGearbox.getEstimatedVoltage(), m_rightGearbox.getEstimatedVoltage()));
 
     }
 
@@ -172,7 +182,6 @@ public class Drive extends Subsystem {
         return segment.isFinished();
     }
 
-
     /**
      * Drive the robot with some help from sensors
      * 
@@ -181,7 +190,6 @@ public class Drive extends Subsystem {
      * @param quickTurn Should quickTurn be enabled?
      */
     public void smoothDrive(double speed, double rotation, boolean quickTurn, boolean invertControl) {
-
 
         // Handle inverse control
         speed = (invertControl) ? speed * -1 : speed;
@@ -232,7 +240,6 @@ public class Drive extends Subsystem {
     public boolean getBrakes() {
         return m_desiredBrakeMode == NeutralMode.Brake;
     }
-
 
     /**
      * Directly drive the gearboxes. This should only be used wile motion profiling

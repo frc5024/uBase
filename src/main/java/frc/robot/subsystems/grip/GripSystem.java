@@ -19,12 +19,12 @@ public class GripSystem extends Subsystem {
     private static GripSystem m_instance = null;
 
     // Subsystem state
-    public enum WantedState {
+    public enum GripState {
         kAcceptBall("Accept Ball"), KGrip("Grip"), KShoot("Shoot"), KStow("Stow");
 
         private String name;
 
-        WantedState(String name) {
+        GripState(String name) {
             this.name = name;
         }
 
@@ -41,7 +41,7 @@ public class GripSystem extends Subsystem {
     EncoderBase m_leftGripSensor, m_rightGripSensor;
     DigitalInput m_ballSensor;
 
-    WantedState m_wantedState = WantedState.KStow;
+    GripState m_wantedState = GripState.KStow;
 
     /* System wants */
     boolean m_hasBall = false;
@@ -121,7 +121,7 @@ public class GripSystem extends Subsystem {
 
     }
 
-    public void setWantedState(WantedState state) {
+    public void setWantedState(GripState state) {
         logger.log("GripSystem", String.format("Wanted state set to: %s", m_wantedState.toString()));
         m_wantedState = state;
     }

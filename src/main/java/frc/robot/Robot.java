@@ -26,7 +26,7 @@ public class Robot extends TimedRobot {
 	FaultReporter reporter = FaultReporter.getInstance();
 
 	/* Subsystems */
-	public static Drive m_drive = new Drive();
+	public static Drive m_drive = Drive.getInstance();
 	public static OI m_oi;
 	public static Limelight m_limelight = new Limelight();
 
