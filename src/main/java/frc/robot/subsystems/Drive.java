@@ -11,6 +11,7 @@ import frc.lib5k.components.gyroscopes.NavX;
 import frc.lib5k.components.motors.TalonSRXCollection;
 import frc.lib5k.components.sensors.EncoderBase;
 import frc.lib5k.control.CubicDeadband;
+import frc.lib5k.control.PIDv2;
 import frc.lib5k.control.SlewLimiter;
 import frc.lib5k.kinematics.DriveConstraints;
 import frc.lib5k.kinematics.DriveSignal;
@@ -59,6 +60,8 @@ public class Drive extends Subsystem {
     EncoderBase m_leftEncoder;
     EncoderBase m_rightEncoder;
 
+    PIDv2 m_turnPID;
+
     // Drive speeds
 
     public Drive() {
@@ -88,7 +91,7 @@ public class Drive extends Subsystem {
         // Set up RaiderDrive
         m_raiderDrive = new RaiderDrive(new CubicDeadband(0.0, Constants.Deadbands.speed_percision),
                 new CubicDeadband(Constants.Deadbands.rotation_deadband, Constants.Deadbands.roataion_percision));
-        m_raiderDrive.setRampRate(Constants.accelerationStep);
+        // m_raiderDrive.setRampRate(Constants.accelerationStep);
 
         m_differentialDrive.setDeadband(0.02);
 
