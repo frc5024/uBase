@@ -129,7 +129,7 @@ public class Robot extends TimedRobot {
 	 * <p>
 	 * You can add additional auto modes by adding additional commands to the
 	 * chooser code above (like the commented example) or additional comparisons to
-	 * the switch structure below with additional strings & commands.
+	 * the switch structure below with additional strings and commands.
 	 */
 	@Override
 	public void autonomousInit() {

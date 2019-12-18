@@ -6,7 +6,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 /**
  * A wrapper for the REV Blinkin LED driver <br>
- * http://www.revrobotics.com/rev-11-1105/
+ * <a href="http://www.revrobotics.com/rev-11-1105/">rev-11-1105</a>
  */
 public class BlinkinDriver extends SendableBase {
 
