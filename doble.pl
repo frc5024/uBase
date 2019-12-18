@@ -18,8 +18,9 @@ if (not defined $mode){
 
 # No matter the mode, we must build the documentation first
 print "Building javadoc\n";
-# system("./gradlew javadoc --console=plain");
+system("./gradlew javadoc --console=plain");
 
+# Deal with javascript bug
 print "Injecting javascript search bugfix\n";
 system("sed -i 's/useModuleDirectories/false/g' build/reports/docs/search.js");
 
@@ -41,9 +42,11 @@ if ($mode eq "-l"){
     my $origin = `git config --get remote.origin.url`;
     chomp $origin;
 
-    # Read the repo name
+    # Read the repo name and dir
     my $name = `basename \`git rev-parse --show-toplevel\``;
+    my $dir = `pwd`;
     chomp $name;
+    chomp $dir;
 
     print "Detected repo settings (Name: '$name', URL: '$origin')\n";
 
@@ -61,10 +64,21 @@ if ($mode eq "-l"){
     chomp $date;
 
     # Checkout a new branch for this docs release
-    system("git checkout -b javadoc-doble-$date");
+    my $new_branch = "javadoc-doble-$date";
+    system("git checkout -b $new_branch");
 
     # Remove all branch contents
     system("rm -rf ./*");
+
+    # Copy all documentation over to new branch
+    system("cp -r $dir/build/reports/docs/* .");
+
+    # Add all and make a commit for the new changes
+    system("git add .");
+    system("git commit -m \"Auto-authored by doble. Javadocs have been updated\"");
+
+    # Push the changes
+    system("git push --set-upstream origin $new_branch");
     
 
 } else {
