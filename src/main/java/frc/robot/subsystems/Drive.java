@@ -11,6 +11,7 @@ import frc.lib5k.components.gyroscopes.NavX;
 import frc.lib5k.components.motors.TalonSRXCollection;
 import frc.lib5k.components.sensors.EncoderBase;
 import frc.lib5k.control.CubicDeadband;
+import frc.lib5k.control.DriveCorrector;
 import frc.lib5k.control.SlewLimiter;
 import frc.lib5k.kinematics.DriveConstraints;
 import frc.lib5k.kinematics.DriveSignal;
@@ -58,6 +59,8 @@ public class Drive extends Subsystem {
     // Encoders
     EncoderBase m_leftEncoder;
     EncoderBase m_rightEncoder;
+
+    DriveCorrector m_corrector = new DriveCorrector(Constants.DriveTrain.forwardPIDGains);
 
     // Drive speeds
 
@@ -257,6 +260,9 @@ public class Drive extends Subsystem {
     public void hybridDrive(double speed, double turn, boolean invertControl) {
         // Determine DriveSignal
         DriveSignal signal = m_raiderDrive.computeSemiConst(speed * ((invertControl) ? -1 : 1), turn, true);
+
+        // Correct the signal
+        signal = m_corrector.correct(signal, NavX.getInstance().getAngle(), 0.2);
 
         rawDrive(signal);
 
