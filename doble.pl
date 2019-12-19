@@ -1,3 +1,5 @@
+#!perl
+
 # doble - The javadoc tool
 # By: Evan Pratten <ewpratten@retrylife.ca>
 
