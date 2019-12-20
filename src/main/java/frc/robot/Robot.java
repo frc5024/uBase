@@ -10,6 +10,7 @@ import frc.lib5k.components.limelight.Limelight;
 import frc.lib5k.components.limelight.Limelight.LEDMode;
 import frc.lib5k.roborio.FaultReporter;
 import frc.lib5k.simulation.Hooks;
+import frc.lib5k.utils.MOTD;
 import frc.lib5k.utils.RobotLogger;
 import frc.lib5k.utils.RobotLogger.Level;
 import frc.robot.autonomous.Chooser;
@@ -48,6 +49,10 @@ public class Robot extends TimedRobot {
 	 */
 	@Override
 	public void robotInit() {
+		// Print robot MOTD
+		MOTD.printFullMOTD();
+
+
 		logger.log("Robot initializing", Level.kRobot);
 		m_oi = new OI();
 
