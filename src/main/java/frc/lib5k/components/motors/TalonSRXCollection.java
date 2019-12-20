@@ -286,6 +286,7 @@ public class TalonSRXCollection extends SpeedControllerGroup implements IMotorCo
         telemetryTable.getEntry("Curent Threshold").setNumber(currentThresh);
         telemetryTable.getEntry("Current Hold").setNumber(currentHold);
         telemetryTable.getEntry("Ramp Rate").setNumber(rampRate);
+        telemetryTable.getEntry("Voltage").setNumber(getEstimatedVoltage());
 
     }
 

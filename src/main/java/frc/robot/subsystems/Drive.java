@@ -107,6 +107,9 @@ public class Drive extends Subsystem {
         // Publish MovementPlanner PIDControllers
         m_movementPlanner.publishPIDControllers();
 
+        m_leftGearbox.setCompensation(true);
+        m_rightGearbox.setCompensation(true);
+
         setRampRate(0.12);
 
     }
@@ -333,8 +336,8 @@ public class Drive extends Subsystem {
     }
 
     public void setRampRate(double rate) {
-        m_leftGearbox.getMaster().configOpenloopRamp(rate);
-        m_rightGearbox.getMaster().configOpenloopRamp(rate);
+        m_leftGearbox.setRampRate(rate);
+        m_rightGearbox.setRampRate(rate);
     }
 
     public void outputTelemetry() {
