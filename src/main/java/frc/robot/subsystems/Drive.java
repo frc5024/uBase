@@ -121,8 +121,8 @@ public class Drive extends Subsystem {
         if (m_isNewConfigData) {
 
             // Set brake mode for all talons
-            m_leftGearbox.getMaster().setNeutralMode(m_desiredBrakeMode);
-            m_rightGearbox.getMaster().setNeutralMode(m_desiredBrakeMode);
+            m_leftGearbox.setNeutralMode(m_desiredBrakeMode);
+            m_rightGearbox.setNeutralMode(m_desiredBrakeMode);
 
             // Data had been sent, disable lock
             m_isNewConfigData = false;
@@ -140,8 +140,6 @@ public class Drive extends Subsystem {
 
         // Output telemetry data
         outputTelemetry();
-
-        // System.out.println(String.format("L: %.2f | R: %.2f", m_leftGearbox.getEstimatedVoltage(), m_rightGearbox.getEstimatedVoltage()));
 
     }
 
