@@ -11,7 +11,7 @@ public class Constants {
         public static final int leftFrontMotor = 1;
         public static final int leftRearMotor = 2;
         public static final int rightFrontMotor = 3;
-        public static final int rightRearMotor = 4;
+        public static final int rightRearMotor = 4; 
 
         public static final int peakCurrent = 35;
         public static final int holdCurrent = 33;
@@ -21,7 +21,7 @@ public class Constants {
 
         // public static PIDProfile driftCorrectionGains = new PIDProfile(1.0, 0.0,
         // 0.0);
-        public static PIDProfile forwardPIDGains = new PIDProfile(0.9, 0.0005, 0.0);
+        public static PIDProfile forwardPIDGains = new PIDProfile(0.1, 0.0, 0.0);
 
         public static PIDProfile motionProfilePID = new PIDProfile(0.9, 0.0005, 0.0);
         // public static PIDProfile turnPIDGains = new PIDProfile(0.05, 0.0, 0.0);

@@ -53,7 +53,7 @@ public class DriveCorrector {
         double speed = (signal.getL() + signal.getR()) / 2;
 
         // Only modify signal if dv is within epsilon and the signal has speed
-        if (Mathutils.epsilonEquals(dv, 0, epsilon) && !Mathutils.epsilonEquals(speed, 0, 0.1)) {
+        if (true){//(Mathutils.epsilonEquals(dv, 0, epsilon) && !Mathutils.epsilonEquals(speed, 0, 0.1)) {
 
             // Determine the wrapped error, and multiply by -1
             double error = Mathutils.getWrappedError(angle, pidController.getSetpoint()) * -1;
