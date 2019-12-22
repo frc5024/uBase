@@ -1,6 +1,6 @@
 #!perl
 
-# doble - The javadoc tool
+# ewpratten's javadoc tool
 # By: Evan Pratten <ewpratten@retrylife.ca>
 
 use 5.010;
